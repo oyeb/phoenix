@@ -19,3 +19,8 @@ class Bot:
     function is_running()
         True or False
 
+
+class roundrobin
+    function constructor(Bot[] running_bots):
+    function alternate(Int time_quanta):
+        does all of the scheduling work between all the processes.
