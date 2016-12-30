@@ -1,26 +1,15 @@
-# Terra (game-engine API)
+# **Terra** (every new game should implement the following classes (game-api?))
+---
 
-class Bot:
+### **class Move:**
++ **Move create_move(JSON_OBJ move) / Constructor:** converts json obj to python obj(Move object here)
 
-    static (common to all bots)
-        opens the file descriptor for log-file-global in write mode
-    function start(String path, String name_of_file) / constructor()
-        inits seccomp-bpf filter, creates new named pipe, log-file-local
-        created, returns success or failure
-    function get_move()
-        waits for n seconds and gets the move played by bot and returns (json
-        object?), else returns null, also writes the move to log-file-local
-    function post_state()
-        writes new game state Obj (json object?) into named pipe, writes to
-        log-file-global
-    function terminate(String reason)
-        default reason="Incorrect bot behavior"
-        abort process, close fds, close filter, returns success or failure
-    function is_running()
-        True or False
+### **class State:**
++ **State create_state(JSON_OBJ state) / Constructor:**
++ **State create_state(file map_file) / constructor:**
 
+### **class game:**
++ **bool is_valid(Move obj):** return true or false by getting the Move obj
++ **State next_state(State prev, Move cur):**returns new state after processing the new move and current state
 
-class roundrobin
-    function constructor(Bot[] running_bots):
-    function alternate(Int time_quanta):
-        does all of the scheduling work between all the processes.
+---

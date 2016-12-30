@@ -32,7 +32,7 @@ So,
 * Bot **gets** `Game` details by `sky`.
 * `Engine` **uses** `sky` to control Bot process and its function and also to handover `Game` state, score and logs to them.
 * `Engine` **uses** `terra` to send Bot moves and `Bot` status to `Game`.
-* `Game` **uses** `terra` to return latest game-state, scores and logs to `Engine` 9which are forwarded).
+* `Game` **uses** `terra` to return latest game-state, scores and logs to `Engine` which are forwarded).
 
 >Whatever be the Game, we can start work on the APIs and the Engine. We already know what the responsibilities of the Engine are.
 
