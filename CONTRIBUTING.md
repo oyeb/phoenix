@@ -13,19 +13,35 @@ To add new features,
 * Then on github.com, open a PR to merge "`topic-branch`" into `upstream/development`
     - Do not forget to tick **Allow edits from maintainers**! (See [why](https://help.github.com/articles/allowing-changes-to-a-pull-request-branch-created-from-a-fork/#enabling-repository-maintainer-permissions-on-existing-pull-requests))
     - **Do not merge this `topic-branch` into your local `development` branch!**
-* Wait for reviews and the eventual merge :1st_place_medal: or rejection :no-entry-sign:.
+* Wait for reviews and the eventual merge :1st_place_medal: or rejection :x:.
 
 ### If you are a collaborator
 
-then you can choose to make a fork or just clone the original.
+then you can:
 
-To add new features,
+1. choose to make a fork or,
+2. just clone the original. ***(THIS IS THE BEST*** :cake: :100: ***METHOD!!)***
 
+And to add new features,
+
+#### 1. if you have a fork,
+
+* Make sure you keep the `master` and `development` branches synced.
 * First branch out from `development` into a "`topic-branch`".
 * Add your changes.
-* Push to your fork _(if you forked, otherwise skip this)_
-* Then on github.com, you go to **[this](https://www.github.com/arrow-/phoenix)** and create a new branch called, you guessed it... `topic-branch` from, you guessed it... `development`.
+* Push to your fork.
+* Then on github.com, you go to **[this repo](https://www.github.com/arrow-/phoenix)** and create a new branch called, you guessed it... `topic-branch` from, you guessed it... `development`.
 * Then you can open a PR from `your-fork:topic-branch` to `upstream:topic-branch`. **Simple**.
-* Wait for reviews and the eventual merge :1st_place_medal: or rejection :no-entry-sign:.
+* Wait for reviews and the eventual merge :1st_place_medal: or rejection :x:.
 
-Eventually, the `topic-branch` will be merged into `development` by the owner and then you can sync `your-fork:development` with `upstream-development`.
+#### 2. without the extra hassle of maintaining a fork,
+
+* Clone **[this repo](https://www.github.com/arrow-/phoenix)**
+* Then branch out from `development` into a "`topic-branch`".
+* Add your changes.
+* Then on github.com, you go to **[this repo](https://www.github.com/arrow-/phoenix)** and create a new branch called, you guessed it... `topic-branch` from, you guessed it... `development`.
+* Push to **[this repo](https://www.github.com/arrow-/phoenix)** repo's `topic-branch`.
+* On github.com, open a PR to merge the `topic-branch` into `development`.
+* Wait for reviews and the eventual merge :1st_place_medal: or rejection :x:.
+
+Eventually, the `topic-branch` will be merged into `development` by the owner and then you can sync `your-local:development` _(and `your-fork:development`)_ with `upstream-development`.
