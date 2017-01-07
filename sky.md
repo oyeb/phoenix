@@ -42,6 +42,9 @@ On the other hand, a bot might _actually_ be unresponsive, and the scores awarde
 :   When a bot is unable to make a move it is said to be "defeated". Engine inspects the `game-state` at each turn to kill bots that have been "defeated".
 Engine appends a game-summary to the `logs` (when `append_logs`) is called.
 
+**init_syscall_filter()**
+:   This function is called just after fork() and just before execlp(). It initializes the seccomp filter and filters out system calls.
+
 ***Any more?***
 
 # Appendix
