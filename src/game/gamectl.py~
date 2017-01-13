@@ -1,0 +1,3 @@
+class Gamectl:
+    def is_valid_move(self, bot_move):
+        pass
