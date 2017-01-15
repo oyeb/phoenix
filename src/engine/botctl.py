@@ -13,7 +13,7 @@ class BotState:
 
 # defined as sky
 class Botctl:
-    def __init__(self, timeout=0.2, args):
+    def __init__(self, args, timeout=0.2):
         """Launches the bot process. timeout (seconds, float accepted) is the 
         time for which the engine waits for the bot to acknowledge i.e. send
         "I'm Poppy!" in the medium (anonymous pipe here). args should be a list,
