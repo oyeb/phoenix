@@ -1,2 +1,0 @@
-# every bot has to write "I'm Poppy" to its STDOUT as a handshake with the engine
-print "I'm Poppy!"
