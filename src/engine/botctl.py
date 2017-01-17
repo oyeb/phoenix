@@ -1,6 +1,7 @@
 import os
 from signal import SIGCONT, SIGSTOP, SIGTERM
 from time import sleep
+from resource import setrlimit, RLIMIT_AS
 import sys
 
 class BotState:
@@ -13,16 +14,16 @@ class BotState:
 
 # defined as sky
 class Botctl:
-    def __init__(self, args, timeout=0.2):
+    def __init__(self, args, timeout=0.2, mem_limit=10**9):
         """Launches the bot process. timeout (seconds, float accepted) is the 
         time for which the engine waits for the bot to acknowledge i.e. send
         "I'm Poppy!" in the medium (anonymous pipe here). args should be a list,
         example: ['/usr/bin/python', 'python', 'bot1.py'] this will be 
-        directly executed with execlp. It also initiates the seccomp-bpf filter
-        to restrict the system calls that can be used by the bot. Resources such
-        as stack and heap or the whole memory is given an upper limit here. We
-        also pipe the STDIN and STDOUT of the bot to some file that can be
-        manipulated by the engine.
+        directly executed with execlp. mem_limit is the memory limit in bytes. 
+        It also initiates the seccomp-bpf filter to restrict the system calls
+        that can be used by the bot. Resources such as stack and heap or the
+        whole memory is given an upper limit here. We also pipe the STDIN and
+        STDOUT of the bot to some file that can be manipulated by the engine.
         """
 
         self.BOTIN_CHILD, self.BOTIN_PARENT = os.pipe()
@@ -46,7 +47,11 @@ class Botctl:
             self.bot_err_log.close()
 
             # seccomp filter
-            # memory management
+
+            
+            # This lime sets 1 GiB of memory per process. It limits the whole
+            # memory, but limiting stack and heap size is not done explicitly.
+            setrlimit(RLIMIT_AS, (mem_limit, mem_limit))
             os.execl(*args)
         else:
             os.close(self.BOTIN_CHILD)
