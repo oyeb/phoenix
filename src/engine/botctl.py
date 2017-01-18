@@ -3,6 +3,7 @@ from signal import SIGCONT, SIGSTOP, SIGTERM
 from time import sleep
 from resource import setrlimit, RLIMIT_AS
 import sys
+from syscall_filter import syscall_filter
 
 class BotState:
     """Bot process status. Decided by the Engine."""
@@ -37,6 +38,10 @@ class Botctl:
         self.bot_pid = os.fork()
         
         if self.bot_pid == 0:
+
+            # seccomp filter
+            syscall_filter()
+
             os.close(self.BOTIN_PARENT)
             os.close(self.BOTOUT_PARENT)
 
@@ -44,14 +49,12 @@ class Botctl:
             os.dup2(self.BOTOUT_CHILD, sys.stdout.fileno())
             os.dup2(self.bot_err_log.fileno(), sys.stderr.fileno())
 
-            self.bot_err_log.close()
-
-            # seccomp filter
-
+            self.bot_err_log.close()            
             
             # This lime sets 1 GiB of memory per process. It limits the whole
             # memory, but limiting stack and heap size is not done explicitly.
             setrlimit(RLIMIT_AS, (mem_limit, mem_limit))
+            
             os.execl(*args)
         else:
             os.close(self.BOTIN_CHILD)
@@ -64,7 +67,7 @@ class Botctl:
 
             sleep(timeout)
 
-            if  self.get_move().strip() == "I'm Poppy!":
+            if self.get_move().strip() == "I'm Poppy!":
                 print "Bot acknowledged"
             else:
                 self.bot_status = BotState.unresponsive
