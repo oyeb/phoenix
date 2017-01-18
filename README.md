@@ -1,8 +1,12 @@
-# phoenix
-This is the AI Challenge backend for Anokha 2017.
+# Phoenix (AI Challenge backend for Anokha 2017)
+
 [saber](http://www.github.com/arrow-/saber) shall be reborn as phoenix this year :wink:.
 
-#TODO
+## Instructions for running the Game:
+
++ run the command "python src" from phoenix directory.
+
+##TODO
 
 Look at the issues
 
