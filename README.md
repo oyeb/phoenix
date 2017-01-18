@@ -6,9 +6,24 @@
 
 + run the command "python src" from phoenix directory.
 
+## Dependencies
+
++ libseccomp ([install it from source](https://vasanthaganeshk.wordpress.com/))
++ cython (pip)
++ python-dev (for Ubuntu), python-devel (for Fedora)
++ libcap-dev (for Ubuntu), libcap-devel (for Fedora)
++ python-prctl (pip)
++ redhat-rpm-config (for Fedora only)
++ build-essential (for Ubuntu), glibc-devel (for Fedora)
+
 ##TODO
 
-Look at the issues
++ Define API for writing the bot (lets call this Titanic). This will be game dependent and language dependent. For example `move_left()` or `split_two()`.
++ Add more syscalls to syscalls_filter(). Such as networking related ones etc.
++ Fine tune the syscalls like open etc. So that they can only open some stuff.
++ Documentation with Sphinx(low priority)
++ Look at the issues
++ Create a pip package(low priority)
 
 #Architecture
 
@@ -58,8 +73,6 @@ So,
 
 #Security
 
-We can protect our system by running bot process in `chroot` jails which help in minimising damages when scripts attempt privilege escalation or arbit code injection.
-
-But a scarier attack would be something like a fork bomb. Such attacks hog CPU and I/O resources. If we do not detect it and stop it in it's early stage -- or prevent it altogether, the server would crash.
+We can protect our system by running bot process in `chroot` jails or `containers` (LXD, LXC or Docker) which help in minimising damages when scripts attempt privilege escalation or arbit code injection.
 
 How do we make sure processes cannot open any kind of `file descriptors`? Be it for IPC or network sockets?
