@@ -71,6 +71,10 @@ So,
 * Subprocess management
     - start, end, resource (mem, cpu, "real" time), privileges
 
+## Bots
+
++ The bots' information must be stored in `bots_config.json` as JSON objects. They must be directly usable by system calls such as exec*
+
 #Security
 
 We can protect our system by running bot process in `chroot` jails or `containers` (LXD, LXC or Docker) which help in minimising damages when scripts attempt privilege escalation or arbit code injection.
