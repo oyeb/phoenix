@@ -8,7 +8,7 @@
 
 ## Dependencies
 
-+ libseccomp ([install it from source](https://vasanthaganeshk.wordpress.com/))
++ libseccomp ([install it from source](https://vasanthaganeshk.wordpress.com/2016/12/24/libseccomp-for-python2-7/))
 + cython (pip)
 + python-dev (for Ubuntu), python-devel (for Fedora)
 + libcap-dev (for Ubuntu), libcap-devel (for Fedora)
