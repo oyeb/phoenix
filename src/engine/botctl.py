@@ -1,3 +1,10 @@
+# This file is part of Phoenix
+#
+# Copyright (c) 2016, 2017 Vasantha Ganesh K.
+#
+# For the full copyright and license information, please view the LICENSE file
+# that was distributed with is source code.
+
 import os
 from signal import SIGCONT, SIGSTOP, SIGTERM
 from time import sleep
