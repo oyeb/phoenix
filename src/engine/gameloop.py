@@ -6,18 +6,59 @@
 # that was distributed with is source code.
 
 from botctl import Botctl
+from game.gamectl import Gamectl
+from time import sleep
 
-def gameloop(args):
+def suspend_all(lst):
+    map(lambda x: x.suspend_bot(), lst)
+
+def resume_all(lst):
+    map(lambda x: x.resume_bot(), lst)
+
+def update_all(lst, new_state):
+    resume_all(lst)
+    map(lambda x: x.update_game_state(new_state), lst)
+    suspend_all(lst)
+    
+def disqualify_bot(lst, position, reason=""):
+    lst[position].write_to_log(reason)
+    lst[position].game_over()
+    lst.pop(position)
+
+def kill_all(lst):
+    map(lambda x: x.game_over(), lst)
+    
+def gameloop(args, map_text):
     """
     This is the game loop, it takes the moves, processes it, writes the new
     state to the medium (here pipe).
     """
-
-    bot = [Botctl(i) for i in args]
+    
+    game = Gamectl()
+    prev_state = map_text
+    bots = [Botctl(i) for i in args]
 
     while True:
-        # moves = [bot[i].get_move() for i in xrange(len(bot))]
-        # print moves
+        update_all(bots, prev_state)
+        
+        moves = []
+        for (bot, num) in zip(bots, xrange(len(bots))):
+            bot.resume_bot()
+            sleep(2)
+            if bot.is_alive():
+                moves.append(bot.get_move())
+                bot.suspend_bot()
+            else:
+                disqualify_bot(bots, num, "The bot died unfortunately!\n")
+
+        valid_moves = []
+        for (move, num) in zip(moves, xrange(len(bots))):
+            if game.is_valid_move(move):
+                valid_moves.append(move)
+            else:
+                disqualify_bot(bots, num, "The bot made an invalid move!\n")
+
+        prev_state = game.next_state_continuous(prev_state, valid_moves)
         break
 
-    
+    kill_all(bots)

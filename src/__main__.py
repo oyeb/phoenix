@@ -14,8 +14,11 @@ if __name__ == "__main__":
     print "Starting Engine".center(80)
     print "="*80
 
-    bots_config_dir = os.path.dirname(os.path.realpath('__file__'))
-    a = open(os.path.join(bots_config_dir, "bots_config.json"), 'r')
+    cdir = os.path.dirname(os.path.realpath('__file__'))
+    a = open(os.path.join(cdir, "bots_config.json"), 'r')
     bot_start_config = map(loads, a.read().strip().split('\n'))
 
-    gameloop(bot_start_config)
+    b = open(os.path.join(cdir, "map_config.json"), 'r')
+    map_text = open(loads(b.read().strip()), 'r').read()
+
+    gameloop(bot_start_config, map_text)

@@ -70,7 +70,7 @@ class Botctl:
             
             self.botin = os.fdopen(self.BOTIN_PARENT, 'w')
             self.botout = os.fdopen(self.BOTOUT_PARENT, 'r')
-            self.bot_move_log = open('bot_move_log.txt', 'w')
+            self.bot_move_log = open('bot_move_log{}.txt'.format(self.bot_pid), 'w')
 
             sleep(timeout)
 
@@ -97,6 +97,18 @@ class Botctl:
         """ Kills the bot process."""
         
         os.kill(self.bot_pid, SIGTERM)
+
+    def is_alive(self):
+        """Check for the existence of unix pid."""
+        try:
+            os.kill(self.bot_pid, 0)
+        except OSError:
+            return False
+        else:
+            return True
+
+    def write_to_log(self, reason=""):
+        moves.append(reason)
 
     def get_move(self):
         """Requests bot to compute a move and write a JSON_OBJ to the medium. The 
