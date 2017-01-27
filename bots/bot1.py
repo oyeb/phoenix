@@ -5,5 +5,6 @@ from time import sleep
 print "I'm Poppy!"
 
 while True:
-    sleep(1)
+    sleep(0.8)
     print "Notice me Senpai!"
+

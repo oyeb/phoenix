@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/homonculus/Code/Projects/phoenix/bots/bot1.py", line 8, in <module>
-    sleep(1)
-KeyboardInterrupt

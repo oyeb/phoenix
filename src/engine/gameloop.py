@@ -16,9 +16,7 @@ def resume_all(lst):
     map(lambda x: x.resume_bot(), lst)
 
 def update_all(lst, new_state):
-    resume_all(lst)
     map(lambda x: x.update_game_state(new_state), lst)
-    suspend_all(lst)
     
 def disqualify_bot(lst, position, reason=""):
     lst[position].write_to_log(reason)
@@ -37,14 +35,16 @@ def gameloop(args, map_text):
     game = Gamectl()
     prev_state = map_text
     bots = [Botctl(i) for i in args]
+    print "Bots were all inited!"
 
     while True:
         update_all(bots, prev_state)
+        suspend_all(bots)
         
         moves = []
         for (bot, num) in zip(bots, xrange(len(bots))):
             bot.resume_bot()
-            sleep(2)
+            sleep(1.0)
             if bot.is_alive():
                 moves.append(bot.get_move())
                 bot.suspend_bot()

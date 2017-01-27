@@ -11,6 +11,7 @@ from time import sleep
 from resource import setrlimit, RLIMIT_AS
 import sys
 from syscall_filter import syscall_filter
+from random import randint
 
 class BotState:
     """Bot process status. Decided by the Engine."""
@@ -38,7 +39,7 @@ class Botctl:
         self.BOTOUT_PARENT, self.BOTOUT_CHILD = os.pipe()
 
         # the stderr is redirected here and logged
-        self.bot_err_log = open('bot_err_log.txt', 'w')
+        self.bot_err_log = open('bot_err_log{}.txt'.format(randint(0, 1000000)), 'w')
 
         self.moves = []
         self.bot_status = BotState.active
