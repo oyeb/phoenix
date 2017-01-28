@@ -6,7 +6,7 @@
 # that was distributed with is source code.
 
 import os
-from signal import SIGCONT, SIGSTOP, SIGTERM
+from signal import SIGCONT, SIGSTOP, SIGTERM, SIGINT
 from time import sleep
 from resource import setrlimit, RLIMIT_AS
 import sys
@@ -46,7 +46,6 @@ class Botctl:
         self.bot_pid = os.fork()
         
         if self.bot_pid == 0:
-
             # seccomp filter
             syscall_filter()
 
@@ -96,8 +95,9 @@ class Botctl:
 
     def kill_bot(self):
         """ Kills the bot process."""
-        
-        os.kill(self.bot_pid, SIGTERM)
+
+        if self.is_alive():
+            os.kill(self.bot_pid, SIGTERM)
 
     def is_alive(self):
         """Check for the existence of unix pid."""
@@ -118,8 +118,10 @@ class Botctl:
         and is suspended. A (penalty or invalid-move) is awarded if move is invalid
         or incomplete. A (penalty or no-move) is awarded is medium is found empty.
         """
-        
-        move =  self.botout.read()
+
+        # self.botout.flush()
+        # os.fsync(self.botout.fileno())
+        move =  self.botout.readline()
         self.moves.append(move)
         return move
 
@@ -131,6 +133,8 @@ class Botctl:
         process to acknowledge receipt by writing to the medium."""
         
         self.botin.write(new_state)
+        # self.botin.flush()
+        # os.fsync(self.botin.fileno())
 
     def append_logs(self):
         """logs is a container (list) of various log-channels like info-from-game,
@@ -145,11 +149,15 @@ class Botctl:
         been "defeated". Engine appends a game-summary to the logs (when 
         append_logs) is called. Also closes all the file descriptors."""
 
-        print "Game over"
-        self.botin.close()
-        self.botout.close()
+        print "="*80
+        print "Game over".center(80)
+        print "="*80
         
         self.append_logs()
         self.bot_move_log.close()
-
+        
+        self.botout.close()
+        self.botin.close()
         self.kill_bot()
+        
+

@@ -25,6 +25,9 @@ def disqualify_bot(lst, position, reason=""):
 
 def kill_all(lst):
     map(lambda x: x.game_over(), lst)
+
+def is_some_bot_alive(lst):
+    return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst))
     
 def gameloop(args, map_text):
     """
@@ -35,9 +38,9 @@ def gameloop(args, map_text):
     game = Gamectl()
     prev_state = map_text
     bots = [Botctl(i) for i in args]
-    print "Bots were all inited!"
 
-    while True:
+    while is_some_bot_alive(bots):
+        print "I'm into gameloop"
         update_all(bots, prev_state)
         suspend_all(bots)
         

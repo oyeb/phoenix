@@ -4,7 +4,9 @@
 
 ## Instructions for running the Game:
 
++ modify `bots_config.json` and `map_config.json` appropriately
 + run the command "python src" from phoenix directory.
+
 
 ## Dependencies
 
@@ -24,6 +26,7 @@
 + Documentation with Sphinx(low priority)
 + Look at the issues
 + Create a pip package(low priority)
++ need proper exception handling
 
 #Architecture
 

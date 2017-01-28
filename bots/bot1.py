@@ -4,7 +4,6 @@ from time import sleep
 
 print "I'm Poppy!"
 
-while True:
+for i in xrange(5):
     sleep(0.8)
     print "Notice me Senpai!"
-
