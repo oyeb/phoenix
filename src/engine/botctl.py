@@ -13,6 +13,7 @@ import sys
 from syscall_filter import syscall_filter
 from random import randint
 import fcntl
+from select import select
 
 class BotState:
     """Bot process status. Decided by the Engine."""
@@ -68,19 +69,17 @@ class Botctl:
             os.close(self.BOTIN_CHILD)
             os.close(self.BOTOUT_CHILD)
             self.bot_err_log.close()
+
+            flg = fcntl.fcntl(self.BOTOUT_PARENT, fcntl.F_GETFL)
+            fcntl.fcntl(self.BOTOUT_PARENT, fcntl.F_SETFL, flg | os.O_NONBLOCK) 
             
             self.botin = os.fdopen(self.BOTIN_PARENT, 'w')
-            self.botout = os.fdopen(self.BOTOUT_PARENT, 'r')
             self.bot_move_log = open('bot_move_log{}.txt'.format(self.bot_pid), 'w')
 
             # enables non blocking read on the bot's stdin so that the engine can read
             # whenever it wants.
-            flg = fcntl.fcntl(self.botin.fileno(), fcntl.F_GETFL)
-            fcntl.fcntl(self.botin.fileno(), fcntl.F_SETFL, flg | os.O_NONBLOCK) 
 
-            sleep(timeout)
-
-            if self.get_move() == "I'm Poppy!":
+            if self.get_move(2.0) == "I'm Poppy!":
                 print "Bot acknowledged"
             else:
                 self.bot_status = BotState.unresponsive
@@ -117,17 +116,18 @@ class Botctl:
     def write_to_log(self, reason=""):
         self.moves.append(reason)
 
-    def get_move(self):
+    def get_move(self, timeout):
         """Requests bot to compute a move and write a JSON_OBJ to the medium. The 
         process is then suspended (not necessarily explicitly). If a valid move is
         not found on the medium within timeout seconds, the bot forgoes this "turn"
         and is suspended. A (penalty or invalid-move) is awarded if move is invalid
         or incomplete. A (penalty or no-move) is awarded is medium is found empty.
         """
-        
-        try:
+
+        ready, _, _ = select([self.BOTOUT_PARENT], [], [], timeout)
+        if len(ready) == 1:
             move =  os.read(self.BOTOUT_PARENT, 100).strip()
-        except OSError:
+        else:
             move = None
             
         self.moves.append(move)
@@ -157,14 +157,12 @@ class Botctl:
         been "defeated". Engine appends a game-summary to the logs (when 
         append_logs) is called. Also closes all the file descriptors."""
 
-        print "="*80
-        print "Game over".center(80)
-        print "="*80
+        print 'Bot died!'
         
         self.append_logs()
         self.bot_move_log.close()
 
         self.kill_bot()
-        self.botout.close()
+        os.close(self.BOTOUT_PARENT)
         self.botin.close()
         

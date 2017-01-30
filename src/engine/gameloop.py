@@ -33,7 +33,7 @@ def kill_all(lst):
 def is_some_bot_alive(lst):
     return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst), False)
     
-def gameloop(args, map_text):
+def gameloop(args, map_text, timeout, max_iters):
     """
     This is the game loop, it takes the moves, processes it, writes the new
     state to the medium (here pipe).
@@ -43,24 +43,24 @@ def gameloop(args, map_text):
     prev_state = map_text
     bots = [Botctl(i) for i in args]
 
-    while is_some_bot_alive(bots):
+    for i in xrange(max_iters):
         update_and_suspend_all(bots, prev_state)
         
         moves = []
         for (bot, num) in zip(bots, xrange(len(bots))):
             bot.resume_bot()
-            sleep(2.0)
+            move = bot.get_move(timeout)
             bot.suspend_bot()
-            
-            move = bot.get_move().strip()
             if bot.is_alive() and game.is_valid_move(move):
                 moves.append(move)
             else:
                 disqualify_bot(bots,
                                num,
                                "Either the bot made an invalid move or time limit exceeded!\n")
-            bot.suspend_bot()
-
         prev_state = game.next_state_continuous(prev_state, moves)
 
-    print 'Out of gameloop'
+    kill_all(bots)
+    
+    print '='*80
+    print 'Game Over'.center(80)
+    print '='*80

@@ -6,9 +6,7 @@ import sys
 print "I'm Poppy!"
 sys.stdout.flush()
 
-for i in xrange(2):
-    sleep(0.5)
+while True:
     a = raw_input()
-    sleep(0.5)
-    print "Notice me Senpai!"
+    print "Notice me Senpai!", a
     sys.stdout.flush()
