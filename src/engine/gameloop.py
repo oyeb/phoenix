@@ -14,9 +14,13 @@ def suspend_all(lst):
 
 def resume_all(lst):
     map(lambda x: x.resume_bot(), lst)
-
-def update_all(lst, new_state):
-    map(lambda x: x.update_game_state(new_state), lst)
+    
+def update_and_suspend_all(lst, new_state):
+    def update_and_suspend(x, new_state):
+        x.update_game_state(new_state)
+        x.suspend_bot()
+        
+    map(lambda x: update_and_suspend(x, new_state), lst)
     
 def disqualify_bot(lst, position, reason=""):
     lst[position].write_to_log(reason)
@@ -27,7 +31,7 @@ def kill_all(lst):
     map(lambda x: x.game_over(), lst)
 
 def is_some_bot_alive(lst):
-    return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst))
+    return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst), False)
     
 def gameloop(args, map_text):
     """
@@ -40,28 +44,23 @@ def gameloop(args, map_text):
     bots = [Botctl(i) for i in args]
 
     while is_some_bot_alive(bots):
-        print "I'm into gameloop"
-        update_all(bots, prev_state)
-        suspend_all(bots)
+        update_and_suspend_all(bots, prev_state)
         
         moves = []
         for (bot, num) in zip(bots, xrange(len(bots))):
             bot.resume_bot()
-            sleep(1.0)
-            if bot.is_alive():
-                moves.append(bot.get_move())
-                bot.suspend_bot()
+            sleep(2.0)
+            bot.suspend_bot()
+            
+            move = bot.get_move().strip()
+            if bot.is_alive() and game.is_valid_move(move):
+                moves.append(move)
             else:
-                disqualify_bot(bots, num, "The bot died unfortunately!\n")
+                disqualify_bot(bots,
+                               num,
+                               "Either the bot made an invalid move or time limit exceeded!\n")
+            bot.suspend_bot()
 
-        valid_moves = []
-        for (move, num) in zip(moves, xrange(len(bots))):
-            if game.is_valid_move(move):
-                valid_moves.append(move)
-            else:
-                disqualify_bot(bots, num, "The bot made an invalid move!\n")
+        prev_state = game.next_state_continuous(prev_state, moves)
 
-        prev_state = game.next_state_continuous(prev_state, valid_moves)
-        break
-
-    kill_all(bots)
+    print 'Out of gameloop'
