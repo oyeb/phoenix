@@ -2,7 +2,7 @@
 
 ## Setters (or the functions that affect the state)
 
-  + **change_direction(child_no:Int, relative_angle:Float)**: After splitting if there are 3 bots, then child_no identifies each one uniquely. relative_angle is `+30^^o` or `-20^^o`
+  + **change_direction(child_no:Int, relative_angle:Float)**: After splitting if there are 3 bots, then child_no identifies each one uniquely. relative_angle is +30<sup>o</sup> or -20<sup>o</sup>
 
   + **eject_mass(child_no:Int)**: ejects some fixed amount of mass for child_no
 
