@@ -10,6 +10,8 @@
 
   + **pause(child_no)**: it makes the bot to come to a stand-still.
 
+### Finally `make_move()` should be called.
+
 ## Getters (functions that do not affect the state)
 
    + **get_bots()**: returns a list of dicts with bot coordinates, bot radius, bot mass, bot score, direction(angle)
