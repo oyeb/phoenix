@@ -17,6 +17,7 @@
 + python-prctl (pip)
 + redhat-rpm-config (for Fedora only)
 + build-essential (for Ubuntu), glibc-devel (for Fedora)
++ jsonschema (pip)
 
 ##TODO
 

@@ -8,6 +8,7 @@ class game:
         for bot in self.game_state['bots']:
             if bot['botname'] == self.name:
                 self.move_obj[bot['childno']] = {
+                    'childno': bot['childno'],
                     'relativeangle':0,
                     'ejectmass':0,
                     'split':False,
@@ -42,7 +43,7 @@ class game:
         '''
         returns a move object in json format for all the children together
         '''
-        return dumps(self.move_obj, indent=4, sort_keys=True)
+        return dumps(self.move_obj.values(), indent=4, sort_keys=True)
 
     def get_children(self):
         '''

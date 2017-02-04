@@ -50,8 +50,9 @@ def gameloop(args, map_text, timeout, max_iters):
         for (bot, num) in zip(bots, xrange(len(bots))):
             bot.resume_bot()
             move = bot.get_move(timeout)
+            print "Move made {}".format(move)
             bot.suspend_bot()
-            if bot.is_alive() and game.is_valid_move(move):
+            if bot.is_alive() and game.is_valid_move(prev_state, move):
                 moves.append(move)
             else:
                 disqualify_bot(bots,

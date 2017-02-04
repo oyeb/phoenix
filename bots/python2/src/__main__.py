@@ -2,16 +2,18 @@ from botapi import game
 from json import loads, dumps
 import sys
 
+print "I'm Poppy!"
+sys.stdout.flush()
+
 while True:
-    game_state = game(sys.stdin.read(), 'kevin')
+    gs_json = raw_input()
+    game_state = game(gs_json, 'kevin')
     
     """
     ============================================================
     Fill with the moves that you have to make on each child
     ============================================================
     """
-
-    print dumps(game_state.get_children(), sort_keys=True, indent=4)
+    
     print game_state.make_move()
     sys.stdout.flush()
-    break
