@@ -1,5 +1,4 @@
 from botapi import game
-from json import loads, dumps
 import sys
 
 print "I'm Poppy!"
@@ -7,7 +6,7 @@ sys.stdout.flush()
 
 while True:
     gs_json = raw_input()
-    game_state = game(gs_json, 'kevin')
+    # game_state = game(gs_json, 'kevin')
     
     """
     ============================================================
@@ -15,5 +14,6 @@ while True:
     ============================================================
     """
     
-    print game_state.make_move()
+    # print game_state.make_move()
+    print gs_json
     sys.stdout.flush()

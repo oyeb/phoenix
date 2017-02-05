@@ -43,7 +43,7 @@ class game:
         '''
         returns a move object in json format for all the children together
         '''
-        return dumps(self.move_obj.values(), indent=4, sort_keys=True)
+        return dumps(self.move_obj.values())
 
     def get_children(self):
         '''
