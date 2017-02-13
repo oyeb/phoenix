@@ -10,7 +10,7 @@ class game:
                 self.move_obj[bot['childno']] = {
                     'childno': bot['childno'],
                     'relativeangle':0,
-                    'ejectmass':0,
+                    'ejectmass':False,
                     'split':False,
                     'pause':False}
         
