@@ -18,6 +18,7 @@
 + redhat-rpm-config (for Fedora only)
 + build-essential (for Ubuntu), glibc-devel (for Fedora)
 + jsonschema (pip)
++ This code can only run on linux and not any unix.
 
 ##TODO
 
