@@ -15,6 +15,11 @@ from random import randint
 import fcntl
 from select import select
 
+# fcntl constant for setting the pipe size. Linux only feature. Not available on
+# other unix os. To use it in C, use `#define _GNU_SOURCE` before #include
+# statements.
+fcntl.F_SETPIPE_SZ = 1031
+
 class BotState:
     """Bot process status. Decided by the Engine."""
     active = 0
@@ -37,8 +42,17 @@ class Botctl:
         STDOUT of the bot to some file that can be manipulated by the engine.
         """
 
+        # Hard coded pipe size
+        self.PIPESZ = 8192
+
         self.BOTIN_CHILD, self.BOTIN_PARENT = os.pipe()
         self.BOTOUT_PARENT, self.BOTOUT_CHILD = os.pipe()
+
+        # Increse the pipe buffer size to 8 MB
+        fcntl.fcntl(self.BOTOUT_CHILD, fcntl.F_SETPIPE_SZ, self.PIPESZ)
+        fcntl.fcntl(self.BOTOUT_PARENT, fcntl.F_SETPIPE_SZ, self.PIPESZ)
+        fcntl.fcntl(self.BOTIN_CHILD, fcntl.F_SETPIPE_SZ, self.PIPESZ)
+        fcntl.fcntl(self.BOTIN_PARENT, fcntl.F_SETPIPE_SZ, self.PIPESZ)
 
         # the stderr is redirected here and logged
         self.bot_err_log = open('bot_err_log{}.txt'.format(randint(0, 1000000)), 'w')
@@ -126,7 +140,7 @@ class Botctl:
 
         ready, _, _ = select([self.BOTOUT_PARENT], [], [], timeout)
         if len(ready) == 1:
-            move =  os.read(self.BOTOUT_PARENT, 100).strip()
+            move =  os.read(self.BOTOUT_PARENT, 8192).strip()
         else:
             move = None
             
