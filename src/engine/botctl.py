@@ -30,7 +30,7 @@ class BotState:
 
 # defined as sky
 class Botctl:
-    def __init__(self, args, timeout=2.0, mem_limit=10**9):
+    def __init__(self, name, args, timeout=2.0, mem_limit=10**9):
         """Launches the bot process. timeout (seconds, float accepted) is the 
         time for which the engine waits for the bot to acknowledge i.e. send
         "I'm Poppy!" in the medium (anonymous pipe here). args should be a list,
@@ -45,6 +45,8 @@ class Botctl:
         # Hard coded pipe size
         self.PIPESZ = 8192
 
+        self.name = name
+
         self.BOTIN_CHILD, self.BOTIN_PARENT = os.pipe()
         self.BOTOUT_PARENT, self.BOTOUT_CHILD = os.pipe()
 
@@ -55,7 +57,7 @@ class Botctl:
         fcntl.fcntl(self.BOTIN_PARENT, fcntl.F_SETPIPE_SZ, self.PIPESZ)
 
         # the stderr is redirected here and logged
-        self.bot_err_log = open('bot_err_log{}.txt'.format(randint(0, 1000000)), 'w')
+        self.bot_err_log = open('bot_err_log{}.txt'.format(self.name), 'w')
 
         self.moves = []
         self.bot_status = BotState.active
@@ -88,7 +90,7 @@ class Botctl:
             fcntl.fcntl(self.BOTOUT_PARENT, fcntl.F_SETFL, flg | os.O_NONBLOCK) 
             
             self.botin = os.fdopen(self.BOTIN_PARENT, 'w')
-            self.bot_move_log = open('bot_move_log{}.txt'.format(self.bot_pid), 'w')
+            self.bot_move_log = open('bot_move_log{}.txt'.format(self.name), 'w')
 
             # enables non blocking read on the bot's stdin so that the engine can read
             # whenever it wants.
@@ -140,7 +142,7 @@ class Botctl:
 
         ready, _, _ = select([self.BOTOUT_PARENT], [], [], timeout)
         if len(ready) == 1:
-            move =  os.read(self.BOTOUT_PARENT, 8192).strip()
+            move =  os.read(self.BOTOUT_PARENT, self.PIPESZ).strip()
         else:
             move = None
             
@@ -171,7 +173,7 @@ class Botctl:
         been "defeated". Engine appends a game-summary to the logs (when 
         append_logs) is called. Also closes all the file descriptors."""
 
-        print 'Bot died!'
+        print '{} died!'.format(self.name)
         
         self.append_logs()
         self.bot_move_log.close()
@@ -179,4 +181,3 @@ class Botctl:
         self.kill_bot()
         os.close(self.BOTOUT_PARENT)
         self.botin.close()
-        

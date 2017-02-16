@@ -8,6 +8,8 @@
 from botctl import Botctl
 from game.gamectl import Gamectl
 from time import sleep
+from json import loads, dumps
+from random import randint
 
 def suspend_all(lst):
     map(lambda x: x.suspend_bot(), lst)
@@ -32,7 +34,23 @@ def kill_all(lst):
 
 def is_some_bot_alive(lst):
     return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst), False)
-    
+
+def initialize_bots(map_text, lst):
+    prev_state = loads(map_text)
+
+    prev_state['bots'] = list(map(lambda x : {'botname':x,
+                                              'score':0,
+                                              'angle':randint(0, 360),
+                                              'velocity':0.59,
+                                              'mass':20,
+                                              'radius':10,
+                                              'childno':0,
+                                              'Xcoordinate':randint(0, 14142),
+                                              'Ycoordinate':randint(0, 14142)}, lst))
+
+    # The '\n' acts as RETURN after the raw_input()
+    return dumps(prev_state)+'\n'
+
 def gameloop(args, map_text, timeout, max_iters):
     """
     This is the game loop, it takes the moves, processes it, writes the new
@@ -40,8 +58,13 @@ def gameloop(args, map_text, timeout, max_iters):
     """
     
     game = Gamectl()
-    prev_state = map_text
-    bots = [Botctl(i) for i in args]
+    args = map(tuple, args)
+    try:
+        bots = [Botctl(name, arg) for name, arg in args]
+    except Exception as e:
+        print "I'm an exception: {}".format(e.message)
+        
+    prev_state = initialize_bots(map_text, [name for name, arg in args])
 
     for i in xrange(max_iters):
         update_and_suspend_all(bots, prev_state)
@@ -50,7 +73,7 @@ def gameloop(args, map_text, timeout, max_iters):
         for (bot, num) in zip(bots, xrange(len(bots))):
             bot.resume_bot()
             move = bot.get_move(timeout)
-            print "Move made {}".format(move)
+            print "{}'s move: {}".format(bot.name, move)
             bot.suspend_bot()
             if bot.is_alive() and game.is_valid_move(prev_state, move):
                 moves.append(move)
