@@ -3,6 +3,8 @@
 	{
 	    "botname": "kevin",
 	    "childno": 0,
+	    "radius":10,
+	    "velocity":0.59,
 	    "Xcoordinate": 25,
 	    "Ycoordinate": 30,
 	    "mass": 20,
@@ -12,6 +14,8 @@
 	{
 	    "botname": "kevin",
 	    "childno": 1,
+	    "radius":90,
+	    "velocity":0.30,
 	    "Xcoordinate": 5,
 	    "Ycoordinate": 30,
 	    "mass": 22,
@@ -21,6 +25,8 @@
 	{
 	    "botname": "juno",
 	    "childno": 0,
+	    "radius":90,
+	    "velocity":0.30,	    
 	    "Xcoordinate": 23,
 	    "Ycoordinate": 600,
 	    "mass": 60,
