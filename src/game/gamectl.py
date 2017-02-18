@@ -1,6 +1,7 @@
 import os
 from json import loads, dumps
 from jsonschema import Draft4Validator
+from vividict import vividict
 
 class Gamectl:
     def is_valid_move(self, prev_state, bot_move):
@@ -28,7 +29,40 @@ class Gamectl:
         """
         Creates a new game-state from the previous state and the new moves made
         by the bots.
+        Moves made are in the following order:
+        direction > split > eject > decay-operation > update-radius > update-velocity-wrt-mass > pause > run-game-for-100-ticks
         """
 
-        # This is for testing purpose
-        return prev_state
+        cur_state = loads(prev_state)
+        bots = vividict()
+        for child in cur_state['bots']:
+            bots[child['botname']][child['childno'])] = child
+
+        for name, moves in bot_move_list:
+            for move in moves:
+                childno = move['childno']
+
+                # direction operation
+                bots[name][childno]['angle'] += move['relativeangle']
+                bots[name][childno]['angle'] %= 360
+
+                # Split takes place here [NOT IMPLEMENTED]
+
+                # eject mass operation
+                if move['ejectmass'] and bots[name][childno][mass] >= 20:
+                    bots[name][childno]['mass'] -= 2
+
+                # decay operation
+                bots[name][childno]['mass'] -= 0.002*bots[name][childno]['mass']
+
+                # update radius
+                bots[name][childno]['radius'] = bots[name][childno]['mass']/2.0
+
+                # update velocity with respect to mass
+                bots[name][childno]['velocity'] = 2.2*(bots[name][childno][mass]**-0.439)
+
+                # pause operation
+                if move['pause']:
+                    bots[name][childno]['velocity'] = 0
+
+                # run game for 100 ticks
