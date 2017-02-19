@@ -17,7 +17,9 @@ def syscall_filter():
 
     fltr.add_rule(seccomp.KILL, 'clone')
     fltr.add_rule(seccomp.KILL, 'fork')
-
+    
+    #gives info about the file
+    fltr.add_rule(seccomp.KILL, 'stat')
     fltr.load()
 
     
