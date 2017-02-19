@@ -27,11 +27,61 @@ class Gamectl:
             else:
                 return False
 
+    def update_position(self, tick_time, bot):
+        bot['Xcoordinate'] -= bot['velocity']*tick_time*cos(radians(bot['angle']))
+        bot['Ycoordinate'] -= bot['velocity']*tick_time*sin(radians(bot['angle']))
+
+    def update_decay(self, bot):
+        bot['mass'] -= 0.002*bot['mass']
+
+    def update_direction(self, bot, rel_angle):
+        bot['angle'] = (rel_angle + bot['angle']) % 360
+
+    def update_velocity(self, bot):
+        """
+        Update velocity with respect to mass
+        """
+        bot['velocity'] = 2.2*(bot['mass']**-0.439)
+
+    def update_radius(self, bot):
+        """
+        Update radius with respect to mass
+        """
+        bot['radius'] = bot['mass']/2.0
+
+    def pause(self, bot):
+        """
+        Bring this particular child to halt
+        """
+        bot['velocity'] = 0
+        
+
+    def eject_mass(self, bot):
+        ejectangle = (bot['angle'] + 180) % 360
+        bots[name][childno]['mass'] -= 2
+        ejectx = bot['Xcoordinate'] - (bot['radius'] + 50)*cos(radians(ejectangle))
+        ejecty = bot['Ycoordinate'] - (bot['radius'] + 50)*sin(radians(ejectangle))
+        return (ejectx, ejecty)
+            
     def genchild(self, nums):
         """
         Return a new unique number for childno of new bot created through split
         """
         return max(nums)+1
+
+    def split(self, bot, newchildno, tick_time):
+        nbot = deepcopy(bot)
+        ejectangle = (bot['angle'] + 180) % 360
+        
+        bot['mass'] /= 2.0
+        bot['radius'] /= 2.0
+        bot['velocity'] = (700 + 2*bot['radius'])/tick_time
+        bot['angle'] = ejectangle
+
+        nbot['childno'] = newchildno
+        nbot['mass'] = bot['mass']
+        nbot['radius'] = bot['radius']
+        nbot['velocity'] = bot['velocity']
 
     def next_state_continuous(self, prev_state, bot_move_list):
         """
@@ -47,6 +97,8 @@ class Gamectl:
         
         cur_state = loads(prev_state)
         moves_all = map(lambda (x, y): (x, loads(y)), bot_move_list)
+        ticks = 5
+        tick_time = 20
         
         bots = vividict()
         for child in cur_state['bots']:
@@ -55,46 +107,31 @@ class Gamectl:
         for name, moves in moves_all:
             for move in moves:
                 childno = move['childno']
+                bot = bots[name][childno]
 
-                # direction operation
-                bots[name][childno]['angle'] += move['relativeangle']
-                bots[name][childno]['angle'] %= 360
-                ejectangle = (180.0 + bots[name][childno]['angle']) % 360
+                self.update_direction(bot, move['relativeangle'])
+                self.update_decay(bot)
 
-                # decay operation
-                bots[name][childno]['mass'] -= 0.002*bots[name][childno]['mass']
+                if move['ejectmass'] and bot['mass'] >= 20.0:
+                    cur_state['food'].append(self.eject_mass(bot))
 
-                # eject mass operation
-                if move['ejectmass'] and bots[name][childno][mass] >= 20.0:
-                    bots[name][childno]['mass'] -= 2
-                    ejectx = bots[name][childno]['Xcoordinate'] - (bots[name][childno]['radius'] + 50)*cos(radians(ejectangle))
-                    ejecty = bots[name][childno]['Ycoordinate'] - (bots[name][childno]['radius'] + 50)*sin(radians(ejectangle))
-                    cur_state['food'].append((ejectx, ejecty))
-
-                # update velocity with respect to mass
-                bots[name][childno]['velocity'] = 2.2*(bots[name][childno]['mass']**-0.439)
-
-                # pause operation
+                self.update_velocity(bot)
                 if move['pause']:
-                    bots[name][childno]['velocity'] = 0         
+                    self.pause(bot)
 
-                # Split operation
-                if bots[name][childno]['mass'] >= 36.0 and len(moves) < 16:
+                if bot['mass'] >= 36.0 and len(moves) < 16 and move['split']:
                     newchildno = self.genchild(bots[name].keys())
-                    bots[name][newchildno] = deepcopy(bots[name][childno])
-                    
-                    bots[name][childno]['mass'] /= 2.0
-                    bots[name][childno]['velocity'] = 0.70 # revise this velocity
-                    bots[name][childno]['angle'] = ejectangle
-                    
-                    bots[name][newchildno]['mass'] /= 2.0
-                    bots[name][newchildno]['velocity'] /= 0.70 # revise this velocity
+                    cur_state['bots'].append(self.split(bot, newchildno, tick_time))
                 
-                # update radius
-                bots[name][childno]['radius'] = bots[name][childno]['mass']/2.0
+                self.update_radius(bot)
 
-                # run-game [NOT IMPLEMENTED]
-
+                for i in xrange(ticks):
+                    map(lambda x : self.update_position(tick_time, x), cur_state['bots'])
+                    # check collisions with food, cells, virus etc
+                    map(lambda x : self.update_decay(x), cur_state['bots'])
+                    map(lambda x : self.update_radius(x), cur_state['bots'])
+                    map(lambda x : self.update_velocity(x), cur_state['bots'])
+                
         # this \n acts like the RETURN key pressed after entering the input
         # [IMPLEMENT EXCEPTION HANDLING HERE IF THERE WAS NO '\n']
         return dumps(cur_state)+'\n'

@@ -21,4 +21,4 @@ if __name__ == "__main__":
     b = open(os.path.join(cdir, "map_config.json"), 'r')
     map_text = open(loads(b.read().strip()), 'r').read()
 
-    gameloop(bot_start_config, map_text, 2.0, 100)
+    gameloop(bot_start_config, map_text, 2.0, 5000)

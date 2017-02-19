@@ -5,7 +5,7 @@
 + Minimum mass for split = 36 units
 + After split parent moves in opposite direction, child moves in the direction the parent was moving
 + After a split the mass of both the children are the same
-+ Distance travelled after split with respect to both the radiuses = 820 + r1 + r2 units (velocity = 0.59 units s<sup>-1</sup>)
++ Distance travelled after split with respect to both the radiuses = 700 + 2r units (velocity = 35.0 units s<sup>-1</sup>)
 + mass of virus = 70 units
 + initial mass of cell = 20 units
 + Minimum mass for eating a virus = 130 units
@@ -19,6 +19,8 @@
 + Mass eject happens in the direction opposite to
 + minimim mass of cell to eject mass = 20 units
 + Time for which each move runs = max(all bot-splits, 500 units moved by bot with mass 20)
++ 1 tick = 20 s
++ Run for 5 ticks
 
 **The origial is available [here](http://agar.gcommer.com/index.php?title=Main_Page)**
 
