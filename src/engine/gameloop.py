@@ -59,6 +59,10 @@ def gameloop(args, map_text, timeout, max_iters):
     
     game = Gamectl()
     args = map(tuple, args)
+    
+    game_state_log = open('game_state_log.txt', 'w')
+    gslog = []
+
     try:
         bots = [Botctl(name, arg) for name, arg in args]
     except Exception as e:
@@ -82,8 +86,10 @@ def gameloop(args, map_text, timeout, max_iters):
                                num,
                                "Either the bot made an invalid move or time limit exceeded!\n")
         prev_state = game.next_state_continuous(prev_state, moves)
+        gslog.append(prev_state)
 
     kill_all(bots)
+    game_state_log.write('\n'.join(gslog))
     
     print '='*80
     print 'Game Over'.center(80)
