@@ -11,6 +11,7 @@ import org.json.simple.JSONValue;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
+        System.out.println("I'm Poppy!");
         /*BufferedReader reader = new BufferedReader(new FileReader("JSONFiles/jsonjson"));
         StringBuilder stringBuilder = new StringBuilder(2048);
         String jsonText;
