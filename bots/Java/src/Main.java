@@ -20,7 +20,7 @@ public class Main {
         String stringBuilder = new String();
         Scanner in = new Scanner(System.in);
         stringBuilder=in.nextLine();
-        System.out.println(stringBuilder);
+        //System.out.println(stringBuilder);
         JSONObject gameState = (JSONObject) JSONValue.parse(stringBuilder.toString());
 
         Bot game = new Bot(gameState, "kevin");
