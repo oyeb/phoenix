@@ -4,4 +4,4 @@
 
 3) The output was [{"ejectmass":false,"split":false,"childno":0,"relativeangle":0,"pause":false},{"ejectmass":false,"split":false,"childno":1,"relativeangle":0,"pause":false}]
 
-4) Its recommended to test this out using different inputs(make sure to have no spaces in the string, JAVA uses space as a delimeter)
+4) Its recommended to test this out using different inputs
