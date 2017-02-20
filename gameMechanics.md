@@ -13,14 +13,13 @@
 + Maximum children = 16
 + Number of viruses are fixed for a map. If a virus is eaten then it re-emerges imediately.
 + Time for the children of same bot to merge = max(30, mass*0.2)
-+ Map dimensions = 14142 X 14142 units <sup>2<sup>
++ Map dimensions = 5000 X 5000 units <sup>2<sup>
 + Each food mass = 2 units
 + Each eject mass = 2 units
-+ Mass eject happens in the direction opposite to
++ Mass eject happens in the direction opposite of motion
 + minimim mass of cell to eject mass = 20 units
 + Time for which each move runs = max(all bot-splits, 500 units moved by bot with mass 20)
 + 1 tick = 20 s
-+ Run for 5 ticks
 
 **The origial is available [here](http://agar.gcommer.com/index.php?title=Main_Page)**
 

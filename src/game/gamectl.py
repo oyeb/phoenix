@@ -28,8 +28,23 @@ class Gamectl:
                 return False
 
     def update_position(self, tick_time, bot):
-        bot['Xcoordinate'] -= bot['velocity']*tick_time*cos(radians(bot['angle']))
-        bot['Ycoordinate'] -= bot['velocity']*tick_time*sin(radians(bot['angle']))
+        newx = bot['Xcoordinate'] - bot['velocity']*tick_time*cos(radians(bot['angle']))
+        newy = bot['Ycoordinate'] - bot['velocity']*tick_time*sin(radians(bot['angle']))
+
+        # Containing the movement within the walls of the map, here half the cell can be
+        # outside the map
+        
+        if newx > 5000:
+            newx = 5000
+        if newx < 0:
+            newx = 0
+        if newy > 5000:
+            newy = 5000
+        if newy < 0:
+            newy = 0
+
+        bot['Xcoordinate'] = newx
+        bot['Ycoordinate'] = newy
 
     def update_decay(self, bot):
         bot['mass'] -= 0.002*bot['mass']
@@ -97,7 +112,6 @@ class Gamectl:
         
         cur_state = loads(prev_state)
         moves_all = map(lambda (x, y): (x, loads(y)), bot_move_list)
-        ticks = 5
         tick_time = 20
         
         bots = vividict()
@@ -125,13 +139,9 @@ class Gamectl:
                 
                 self.update_radius(bot)
 
-                for i in xrange(ticks):
-                    map(lambda x : self.update_position(tick_time, x), cur_state['bots'])
-                    # check collisions with food, cells, virus etc
-                    map(lambda x : self.update_decay(x), cur_state['bots'])
-                    map(lambda x : self.update_radius(x), cur_state['bots'])
-                    map(lambda x : self.update_velocity(x), cur_state['bots'])
-                
+                map(lambda x : self.update_position(tick_time, x), cur_state['bots'])
+                # check collisions with food, cells, virus etc
+        
         # this \n acts like the RETURN key pressed after entering the input
         # [IMPLEMENT EXCEPTION HANDLING HERE IF THERE WAS NO '\n']
         return dumps(cur_state)+'\n'

@@ -45,8 +45,8 @@ def initialize_bots(map_text, lst):
                                               'mass':20,
                                               'radius':10,
                                               'childno':0,
-                                              'Xcoordinate':randint(0, 14142),
-                                              'Ycoordinate':randint(0, 14142)}, lst))
+                                              'Xcoordinate':randint(0, 5000),
+                                              'Ycoordinate':randint(0, 5000)}, lst))
 
     # The '\n' acts as RETURN after the raw_input()
     return dumps(prev_state)+'\n'
@@ -86,10 +86,10 @@ def gameloop(args, map_text, timeout, max_iters):
                                num,
                                "Either the bot made an invalid move or time limit exceeded!\n")
         prev_state = game.next_state_continuous(prev_state, moves)
-        gslog.append(dumps(loads(prev_state), indent=4))
+        gslog.append(prev_state)
 
     kill_all(bots)
-    game_state_log.write('\n'.join(gslog))
+    game_state_log.write('\n,'.join(gslog))
     
     print '='*80
     print 'Game Over'.center(80)
