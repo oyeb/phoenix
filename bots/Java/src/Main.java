@@ -19,7 +19,7 @@ public class Main {
         }*/
         String stringBuilder = new String();
         Scanner in = new Scanner(System.in);
-        stringBuilder=in.next();
+        stringBuilder=in.nextLine();
         System.out.println(stringBuilder);
         JSONObject gameState = (JSONObject) JSONValue.parse(stringBuilder.toString());
 
