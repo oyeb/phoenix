@@ -67,13 +67,14 @@ def collision_bot_static_entity(bot, entity, rad):
     '''
     
     init = bot['center']
-    end = update_position(20.0, bot)
+    update_position(20.0, bot)
+    end = bot['center']
     d = closest_point_on_line(init, end, entity)
 
     # Trigonometry
     if point_on_lsegment(init, end, d) and dist(d, entity) <= bot['radius'] and bot['radius'] >= 1.8*rad:
         time_coll = (dist(init, d) - sqrt(bot['radius']**2 - dist(d, entity)**2))/bot['velocity']
-        return (True, time_col)
+        return (True, time_coll)
     else:
         return (False, None)
 
@@ -92,11 +93,11 @@ def collision_bots_dynamic(bota, botb):
     vy = velb*sin(radians(angb)) - velb*sin(radians(anga))
 
     init = botb['center']
-    end = map_restriction(vx*20, vy*20)
+    end = map_restriction((botb['center'][0]+vx*20, botb['center'][0]+vy*20))
     d = closest_point_on_line(init, end, bota['center'])
     
     if bota['radius'] >= 1.8*botb['radius'] and point_on_lsegment(init, end, d) and dist(d, bota['center']) <= botb['radius']:
         time_coll = (dist(init, d) - sqrt(botb['radius']**2 - dist(d, bota['radius'])**2))/sqrt(vx**2 + vy**2)
-        return (True, time_col)
+        return (True, time_coll)
     else:
         return (False, None)

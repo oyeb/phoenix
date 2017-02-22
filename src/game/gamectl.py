@@ -80,6 +80,79 @@ class Gamectl:
         nbot['radius'] = bot['radius']
         nbot['velocity'] = bot['velocity']
 
+    def colls_entities(self, bots, entity, rad):
+        '''
+        return a list of (time, 'entity_type', bot, entity_coordinates)
+        '''
+        etype = 'food' if rad == 2 else 'virus'
+        
+        collse = []
+        for i in entity:
+            for j in bots:
+                collse.append((collisions.collision_bot_static_entity(j, i, rad), (j, i)))
+
+        collse = filter(lambda ((a, b), (c, d)): a, collse)
+        return [(b, etype, c, d) for ((a, b),(c, d)) in collse]
+
+    def colls_bots(self, bots):
+        '''
+        return a list of (time, 'bot', bot, bot)
+        '''
+        
+        collsb = []
+        for i in range(len(bots)):
+            for j in range(len(bots)):
+                if i < j:
+                    a, b = collisions.collision_bots_dynamic(bots[i], bots[j])
+                    if a:
+                        collsb.append(b, 'bot', bots[i], bots[j])
+        return collsb
+
+    def perform_collisions(self, dets, bots, viruses, foods):
+        colls = self.colls_entities(bots, foods, 2)
+        colls.extend(self.colls_entities(bots, viruses, 35))
+        colls.extend(self.colls_bots(bots))
+        colls.sort()
+
+        for (t, etype, bt, entity) in colls:
+            bname = bt['botname']
+
+            if bt['childno'] in dets[bname]:
+                child = dets[bname][bt['childno']]
+                
+                if etype == 'virus':
+                    if len(dets[bname].keys()) == 16:
+                        child['mass'] += 70
+                        child['score'] += 70*3
+                    else:
+                        newchild = self.genchild(dets[bt['botname']].keys())
+                        dets[bname][newchild] = deepcopy(child)
+                        child['mass'] /= 2.0
+                        dets[bname][newchild]['mass'] /= 2.0
+                    del dets['virus'][tuple(entity)]
+                    
+                elif etype == 'food':
+                    child['mass'] += 2
+                    del dets['food'][tuple(entity)]
+                    
+                elif etype == 'bot' and entity['childno'] in dets[entity['botname']]:
+                    bota, botb = child, dets[entity['botname']][entity['childno']]
+                    bota, botb = (bota, botb) if bota['radius'] > botb['radius'] else (botb, bota)
+                    
+                    if bota['botname'] == botb['botname']:
+                        bota[score] += botb['score']
+                    else:
+                        bota['mass'] += botb['mass']
+                        bota['score'] += 10*botb['mass']    
+                    del botb
+
+                    
+    def add_virus_food(self, dets, cnt_virus, cnt_food):
+        for i in range(cnt_virus):
+            dets['virus'][(randint(0, 4992), randint(0, 2808))] = None
+        for i in range(cnt_food):
+            dets['food'][(randint(0, 4992), randint(0, 2808))] = None
+
     def next_state_continuous(self, prev_state, bot_move_list):
         """
         Creates a new game-state from the previous state and the new moves made
@@ -99,6 +172,10 @@ class Gamectl:
         bots = vividict()
         for child in cur_state['bots']:
             bots[child['botname']][child['childno']] = child
+        for virus in cur_state['virus']:
+            bots['virus'][tuple(virus)] = None
+        for food in cur_state['food']:
+            bots['food'][tuple(food)] = None
 
         for name, moves in moves_all:
             for move in moves:
@@ -121,9 +198,28 @@ class Gamectl:
                 
                 self.update_radius(bot)
 
+                food_cnt = len(bots['food'].keys())
+                virus_cnt = len(bots['virus'].keys())
+                
+                self.perform_collisions(bots, cur_state['bots'], cur_state['virus'], cur_state['food'])
+
+                self.add_virus_food(bots, virus_cnt - len(bots['virus'].keys()), food_cnt - len(bots['food'].keys()))
+
+                processed_bots = []
+                for bname in bots.keys():
+                    if bname != 'virus' and bname != 'food':
+                        processed_bots.extend(bots[bname].values())
+                processed_food = bots['food'].keys()
+                processed_virus= bots['virus'].keys()
+
+                cur_state['bots'] = processed_bots
+                cur_state['virus'] = processed_virus
+                cur_state['food'] = processed_food
+                
                 map(lambda x : collisions.update_position(tick_time, x), cur_state['bots'])
-                # check collisions with food, cells, virus etc
-        
+                map(lambda x : self.update_velocity(x), cur_state['bots'])
+                map(lambda x : self.update_radius(x), cur_state['bots'])
+
         # this \n acts like the RETURN key pressed after entering the input
         # [IMPLEMENT EXCEPTION HANDLING HERE IF THERE WAS NO '\n']
         return dumps(cur_state)+'\n'
