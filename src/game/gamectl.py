@@ -166,6 +166,7 @@ class Gamectl:
         """
         
         cur_state = loads(prev_state)
+    
         moves_all = map(lambda (x, y): (x, loads(y)), bot_move_list)
         tick_time = 20
         
