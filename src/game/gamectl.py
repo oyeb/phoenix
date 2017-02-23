@@ -18,7 +18,7 @@ class Gamectl:
             game_state = loads(prev_state)
             Draft4Validator(loads(move_schema)).validate(move)
         except Exception as e:
-            print "I'm the exception: {}".format(e.message)
+            print "[*] Exception: {}".format(e.message)
             return False
         else:
             chld_prev_state = sorted(set(list(map(lambda x: x['childno'], game_state['bots']))))

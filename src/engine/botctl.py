@@ -46,6 +46,7 @@ class Botctl:
         self.PIPESZ = 8192
 
         self.name = name
+        self.valid = False
 
         self.BOTIN_CHILD, self.BOTIN_PARENT = os.pipe()
         self.BOTOUT_PARENT, self.BOTOUT_CHILD = os.pipe()
@@ -96,11 +97,11 @@ class Botctl:
             # whenever it wants.
 
             if self.get_move(2.0) == "I'm Poppy!":
+                self.valid = True
                 print "[*] {} has been acknowledged.".format(self.name)
             else:
-                self.bot_status = BotState.unresponsive
                 print "[*] {} is unresponsive".format(self.name)
-                self.game_over()
+                # self.game_over()
 
     def suspend_bot(self):
         """ Suspends the bot process (if currently active)."""

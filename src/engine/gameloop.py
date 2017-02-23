@@ -26,10 +26,9 @@ def update_and_suspend_all(lst, new_state):
         
     map(lambda x: update_and_suspend(x, new_state), lst)
     
-def disqualify_bot(lst, position, reason=""):
-    lst[position].write_to_log(reason)
-    lst[position].game_over()
-    lst.pop(position)
+def qualified_bots(lst):
+    kill_all(filter(lambda x: not(x.valid), lst))
+    return filter(lambda x: x.valid, lst)
 
 def kill_all(lst):
     map(lambda x: x.game_over(), lst)
@@ -66,12 +65,17 @@ def gameloop(args, map_text, timeout, max_iters):
 
     try:
         bots = [Botctl(name, arg) for name, arg in args]
+        bots = qualified_bots(bots)
+        
     except Exception as e:
-        print "I'm an exception: {}".format(e.message)
+        print "[*] Exception: {}".format(e.message)
         
     prev_state = initialize_bots(map_text, [name for name, arg in args])
 
     for i in tqdm(xrange(max_iters)):
+        if len(bots) <= 1:
+            break
+
         update_and_suspend_all(bots, prev_state)
         
         moves = []
@@ -83,11 +87,11 @@ def gameloop(args, map_text, timeout, max_iters):
             if bot.is_alive() and game.is_valid_move(prev_state, move):
                 moves.append((bot.name, move))
             else:
-                disqualify_bot(bots,
-                               num,
-                               "Either the bot made an invalid move or time limit exceeded!\n")
+                bot.valid = False
         prev_state = game.next_state_continuous(prev_state, moves)
         gslog.append(prev_state)
+        
+        bots = qualified_bots(bots)
 
     kill_all(bots)
     game_state_log.write('\n,'.join(gslog))
