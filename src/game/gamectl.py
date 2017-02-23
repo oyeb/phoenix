@@ -5,6 +5,7 @@ from jsonschema import Draft4Validator
 from vividict import vividict
 from copy import deepcopy
 from math import sin, cos, radians
+from random import randint
 
 class Gamectl:
     def is_valid_move(self, prev_state, bot_move):
