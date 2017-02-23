@@ -19,6 +19,7 @@ def resume_all(lst):
     
 def update_and_suspend_all(lst, new_state):
     def update_and_suspend(x, new_state):
+        x.resume_bot()
         x.update_game_state(new_state)
         x.suspend_bot()
         
