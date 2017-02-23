@@ -10,6 +10,7 @@ from game.gamectl import Gamectl
 from time import sleep
 from json import loads, dumps
 from random import randint
+from tqdm import tqdm
 
 def suspend_all(lst):
     map(lambda x: x.suspend_bot(), lst)
@@ -70,15 +71,15 @@ def gameloop(args, map_text, timeout, max_iters):
         
     prev_state = initialize_bots(map_text, [name for name, arg in args])
 
-    for i in xrange(max_iters):
+    for i in tqdm(xrange(max_iters)):
         update_and_suspend_all(bots, prev_state)
         
         moves = []
         for (bot, num) in zip(bots, xrange(len(bots))):
             bot.resume_bot()
             move = bot.get_move(timeout)
-            print "{}'s move: {}".format(bot.name, move)
             bot.suspend_bot()
+            
             if bot.is_alive() and game.is_valid_move(prev_state, move):
                 moves.append((bot.name, move))
             else:

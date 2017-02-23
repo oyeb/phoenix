@@ -96,10 +96,10 @@ class Botctl:
             # whenever it wants.
 
             if self.get_move(2.0) == "I'm Poppy!":
-                print "Bot acknowledged"
+                print "[*] {} has been acknowledged.".format(self.name)
             else:
                 self.bot_status = BotState.unresponsive
-                print "Bot unresponsive"
+                print "[*] {} is unresponsive".format(self.name)
                 self.game_over()
 
     def suspend_bot(self):
@@ -173,7 +173,7 @@ class Botctl:
         been "defeated". Engine appends a game-summary to the logs (when 
         append_logs) is called. Also closes all the file descriptors."""
 
-        print '{} died!'.format(self.name)
+        print '[*] {} died!'.format(self.name)
         
         self.append_logs()
         self.bot_move_log.close()
