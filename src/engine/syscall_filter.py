@@ -1,6 +1,6 @@
 # This file is part of Phoenix
 #
-# Copyright (c) 2016, 2017 Vasantha Ganesh K.
+# Copyright (c) 2016, 2017 Vasantha Ganesh K, Gautam Sudesh <gtmsdsh@gmail.com>.
 #
 # For the full copyright and license information, please view the LICENSE file
 # that was distributed with is source code.
@@ -292,6 +292,7 @@ def syscall_filter():
     
     # clock and time functions
     fltr.add_rule(seccomp.KILL, 'clock_settime')
+    fltr.add_rule(seccomp.KILL, 'clock_gettime')
     
     #change file last access and modification times
     fltr.add_rule(seccomp.KILL, 'utimes')
@@ -379,8 +380,34 @@ def syscall_filter():
     # queue a signal and data    
     fltr.add_rule(seccomp.KILL, 'rt_tgsigqueueinfo')
     
-    # receive multiple messages on a socket 
+    #send or receive multiple messages on a socket 
     fltr.add_rule(seccomp.KILL, 'recvmmsg')
+    fltr.add_rule(seccomp.KILL, 'sendmmsg')
+    
+    # transfer data between process address spaces 
+    fltr.add_rule(seccomp.KILL, 'process_vm_readv')
+    fltr.add_rule(seccomp.KILL, 'process_vm_writev')
+    
+    # compare two processes to determine if they share a kernel resource
+    fltr.add_rule(seccomp.KILL, 'kcmp')
+    
+    #load a kernel module
+    fltr.add_rule(seccomp.KILL, 'finit_module')
+    
+    #operate on Secure Computing state of the process
+    fltr.add_rule(seccomp.KILL, 'seccomp')
+    
+    #obtain a series of random bytes
+    fltr.add_rule(seccomp.KILL, 'getrandom')
+    
+    #perform a command on an extended BPF map or program
+    fltr.add_rule(seccomp.KILL, 'bpf')
+    
+    #allow the implementation of on-demand paging from userland
+    fltr.add_rule(seccomp.KILL, 'userfaultfd')
+    
+    #copy a range of data from one file to another
+    fltr.add_rule(seccomp.KILL, 'copy_file_range')
     
     fltr.load()
 
