@@ -13,7 +13,7 @@ def generate_map(old_map):
   }
   no_of_food = randrange(800,1000)
   for i in xrange(no_of_food):
-      new_map["food"].append([randrange(0,5000),randrange(0,5000)])
+      new_map["food"].append([randrange(0,4992),randrange(0,2808)])
   new_map["virus"].append(280,2800)
   new_map["virus"].append(2800,1400)
   new_map["virus"].append(1400,700)
