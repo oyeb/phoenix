@@ -227,7 +227,9 @@ class Gamectl:
                 # END OF DEBUG THIS
                 ##########
 
-                map(lambda x : collisions.update_position(tick_time, x), cur_state['bots'])
+                for i in cur_state['bots']:
+                    i['center'] = collisions.update_position(tick_time, i)
+                    
                 map(lambda x : self.update_velocity(x), cur_state['bots'])
                 map(lambda x : self.update_radius(x), cur_state['bots'])
 

@@ -21,7 +21,7 @@ def update_position(tick_time, bot):
     newx = bot['center'][0] + bot['velocity']*tick_time*cos(radians(bot['angle']))
     newy = bot['center'][1] + bot['velocity']*tick_time*sin(radians(bot['angle']))
 
-    bot['center'] = map_restriction((newx, newy))    
+    return map_restriction((newx, newy))    
 
 def closest_point_on_line(line_init_pt, line_end_pt, sep_pt):
     lx1, ly1 = line_init_pt
@@ -68,8 +68,7 @@ def collision_bot_static_entity(bot, entity, rad):
     '''
     
     init = bot['center']
-    update_position(20.0, bot)
-    end = bot['center']
+    end = update_position(20.0, bot)
     d = closest_point_on_line(init, end, entity)
 
     # Trigonometry
@@ -104,7 +103,7 @@ def collision_bots_dynamic(bota, botb):
         (dist(init, bota['center']) <= bota['radius']) or
         (dist(end, bota['center']) <= bota['radius'])) and bota['radius'] >= 1.8*botb['radius']:
         
-        time_coll = (dist(init, d) - sqrt(botb['radius']**2 - dist(d, bota['radius'])**2))/sqrt(vx**2 + vy**2)
+        time_coll = (dist(init, d) - sqrt(botb['radius']**2 - dist(d, bota['center'])**2))/sqrt(vx**2 + vy**2)
         print "[*] Event: bot another bot"
         return (True, time_coll)
     else:
