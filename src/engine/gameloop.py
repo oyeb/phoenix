@@ -42,45 +42,46 @@ def gameloop(args, map_text, timeout, max_iters):
     state to the medium (here pipe).
     """
     
-    game = Gamectl()
-    args = map(tuple, args)
-    
-    game_state_log = open('game_state_log.txt', 'w')
-    gslog = []
-
     try:
+        game = Gamectl()
+        args = map(tuple, args)
+        
+        game_state_log = open('game_state_log.txt', 'w')
+        gslog = []
+        
         bots = [Botctl(name, arg) for name, arg in args]
         bots = qualified_bots(bots)
+                        
+        prev_state = game.initialize_bots(map_text, [name for name, arg in args])
         
-    except Exception as e:
-        print "[*] Exception: {}".format(e.message)
-        
-    prev_state = game.initialize_bots(map_text, [name for name, arg in args])
-
-    for i in tqdm(xrange(max_iters)):
-        if len(bots) <= 1:
-            break
-
-        update_and_suspend_all(bots, prev_state)
-        
-        moves = []
-        for (bot, num) in zip(bots, xrange(len(bots))):
-            bot.resume_bot()
-            move = bot.get_move(timeout)
-            bot.suspend_bot()
+        for i in tqdm(xrange(max_iters)):
+            if len(bots) <= 1:
+                break
             
-            if bot.is_alive() and game.is_valid_move(prev_state, move):
-                moves.append((bot.name, move))
-            else:
-                bot.valid = False
-        prev_state = game.next_state_continuous(prev_state, moves)
-        gslog.append(prev_state)
-        
-        bots = qualified_bots(bots)
+            update_and_suspend_all(bots, prev_state)
+            
+            moves = []
+            for (bot, num) in zip(bots, xrange(len(bots))):
+                bot.resume_bot()
+                move = bot.get_move(timeout)
+                bot.suspend_bot()
+                
+                if bot.is_alive() and game.is_valid_move(prev_state, move):
+                    moves.append((bot.name, move))
+                else:
+                    bot.valid = False
+            prev_state = game.next_state_continuous(prev_state, moves)
+            gslog.append(prev_state)
+                    
+            bots = qualified_bots(bots)
 
-    kill_all(bots)
-    game_state_log.write('\n,'.join(gslog))
+    except Exception as e:
+        print '[*] Exception: {}'.format(e.message)
+
+    finally:
+        kill_all(bots)
+        game_state_log.write('\n,'.join(gslog))
     
-    print '='*80
-    print 'Game Over'.center(80)
-    print '='*80
+        print '='*80
+        print 'Game Over'.center(80)
+        print '='*80
