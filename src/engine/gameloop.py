@@ -41,12 +41,12 @@ def initialize_bots(map_text, lst):
 
     prev_state['bots'] = list(map(lambda x : {'botname':x,
                                               'score':0,
-                                              'angle':randint(0, 360),
+                                              'angle':0,
                                               'velocity':0.59,
                                               'mass':20,
-                                              'radius':10,
+                                              'radius':100,
                                               'childno':0,
-                                              'center':(randint(0, 4992), randint(0, 2808))}, lst))
+                                              'center':(0, randint(0, 2808))}, lst))
 
     # The '\n' acts as RETURN after the raw_input()
     return dumps(prev_state)+'\n'

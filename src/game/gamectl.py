@@ -199,7 +199,9 @@ class Gamectl:
                     cur_state['bots'].append(self.split(bot, newchildno, tick_time))
                 
                 self.update_radius(bot)
-
+                
+                ##########
+                #DEBUG THIS
                 food_cnt = len(bots['food'].keys())
                 virus_cnt = len(bots['virus'].keys())
                 
@@ -217,6 +219,8 @@ class Gamectl:
                 cur_state['bots'] = processed_bots
                 cur_state['virus'] = processed_virus
                 cur_state['food'] = processed_food
+                # END OF DEBUG THIS
+                ##########
                 
                 map(lambda x : collisions.update_position(tick_time, x), cur_state['bots'])
                 map(lambda x : self.update_velocity(x), cur_state['bots'])

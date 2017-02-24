@@ -18,8 +18,8 @@ def map_restriction((newx, newy)):
     return (newx, newy)
 
 def update_position(tick_time, bot):
-    newx = bot['center'][0] - bot['velocity']*tick_time*cos(radians(bot['angle']))
-    newy = bot['center'][1] - bot['velocity']*tick_time*sin(radians(bot['angle']))
+    newx = bot['center'][0] + bot['velocity']*tick_time*cos(radians(bot['angle']))
+    newy = bot['center'][1] + bot['velocity']*tick_time*sin(radians(bot['angle']))
 
     bot['center'] = map_restriction((newx, newy))    
 
@@ -74,6 +74,7 @@ def collision_bot_static_entity(bot, entity, rad):
     # Trigonometry
     if point_on_lsegment(init, end, d) and dist(d, entity) <= bot['radius'] and bot['radius'] >= 1.8*rad:
         time_coll = (dist(init, d) - sqrt(bot['radius']**2 - dist(d, entity)**2))/bot['velocity']
+        print "[*] Event: bot ate a food or virus"
         return (True, time_coll)
     else:
         return (False, None)
@@ -93,11 +94,12 @@ def collision_bots_dynamic(bota, botb):
     vy = velb*sin(radians(angb)) - velb*sin(radians(anga))
 
     init = botb['center']
-    end = map_restriction((botb['center'][0]+vx*20, botb['center'][0]+vy*20))
+    end = map_restriction((botb['center'][0]+vx*20, botb['center'][1]+vy*20))
     d = closest_point_on_line(init, end, bota['center'])
     
     if bota['radius'] >= 1.8*botb['radius'] and point_on_lsegment(init, end, d) and dist(d, bota['center']) <= botb['radius']:
         time_coll = (dist(init, d) - sqrt(botb['radius']**2 - dist(d, bota['radius'])**2))/sqrt(vx**2 + vy**2)
+        print "[*] Event: bot another bot"
         return (True, time_coll)
     else:
         return (False, None)
