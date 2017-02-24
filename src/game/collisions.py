@@ -1,4 +1,5 @@
 from math import sqrt, radians, sin, cos
+from timeOfColl import TimeOfClosestApproach
 
 def map_restriction((newx, newy)):
     '''
@@ -103,7 +104,7 @@ def collision_bots_dynamic(bota, botb):
         (dist(init, bota['center']) <= bota['radius']) or
         (dist(end, bota['center']) <= bota['radius'])) and bota['radius'] >= 1.8*botb['radius']:
         
-        time_coll = (dist(init, d) - sqrt(botb['radius']**2 - dist(d, bota['center'])**2))/sqrt(vx**2 + vy**2)
+        time_coll = TimeOfClosestApproach(bota, botb)
         print "[*] Event: bot another bot"
         return (True, time_coll)
     else:

@@ -29,6 +29,22 @@ class Gamectl:
             else:
                 return False
 
+
+    def initialize_bots(self, map_text, lst):
+        prev_state = loads(map_text)
+        
+        prev_state['bots'] = list(map(lambda x : {'botname':x,
+                                                  'score':0,
+                                                  'angle':randint(0, 359),
+                                                  'velocity':0.59,
+                                                  'mass':20,
+                                                  'radius':10,
+                                                  'childno':0,
+                                                  'center':(randint(0, prev_state['maxX']), randint(0, prev_state['maxY']))}, lst))
+
+        # The '\n' acts as RETURN after the raw_input()
+        return dumps(prev_state)+'\n'
+
     def update_decay(self, bot):
         bot['mass'] -= 0.002*bot['mass']
 

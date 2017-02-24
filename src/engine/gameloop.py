@@ -36,21 +36,6 @@ def kill_all(lst):
 def is_some_bot_alive(lst):
     return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst), False)
 
-def initialize_bots(map_text, lst):
-    prev_state = loads(map_text)
-
-    prev_state['bots'] = list(map(lambda x : {'botname':x,
-                                              'score':0,
-                                              'angle':0,
-                                              'velocity':0.59,
-                                              'mass':500,
-                                              'radius':250,
-                                              'childno':0,
-                                              'center':(0, randint(0, 2808))}, lst))
-
-    # The '\n' acts as RETURN after the raw_input()
-    return dumps(prev_state)+'\n'
-
 def gameloop(args, map_text, timeout, max_iters):
     """
     This is the game loop, it takes the moves, processes it, writes the new
@@ -70,7 +55,7 @@ def gameloop(args, map_text, timeout, max_iters):
     except Exception as e:
         print "[*] Exception: {}".format(e.message)
         
-    prev_state = initialize_bots(map_text, [name for name, arg in args])
+    prev_state = game.initialize_bots(map_text, [name for name, arg in args])
 
     for i in tqdm(xrange(max_iters)):
         if len(bots) <= 1:
