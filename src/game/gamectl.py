@@ -109,9 +109,14 @@ class Gamectl:
                         collsb.append(b, 'bot', bots[i], bots[j])
         return collsb
 
-    def perform_collisions(self, dets, bots, viruses, foods):
-        colls = self.colls_entities(bots, foods, 2)
-        colls.extend(self.colls_entities(bots, viruses, 35))
+    def perform_collisions(self, dets):
+        bots = []
+        for bname in dets.keys():
+            if bname != 'virus' and bname != 'food':
+                bots.extend(dets[bname].values())
+
+        colls = self.colls_entities(bots, dets['food'].keys(), 2)
+        colls.extend(self.colls_entities(bots, dets['virus'].keys(), 35))
         colls.extend(self.colls_bots(bots))
         colls.sort()
 
@@ -121,7 +126,7 @@ class Gamectl:
             if bt['childno'] in dets[bname]:
                 child = dets[bname][bt['childno']]
                 
-                if etype == 'virus':
+                if etype == 'virus' and tuple(entity) in dets['virus']:
                     if len(dets[bname].keys()) == 16:
                         child['mass'] += 70
                         child['score'] += 70*3
@@ -132,7 +137,7 @@ class Gamectl:
                         dets[bname][newchild]['mass'] /= 2.0
                     del dets['virus'][tuple(entity)]
                     
-                elif etype == 'food':
+                elif etype == 'food' and tuple(entity) in dets['food']:
                     child['mass'] += 2
                     del dets['food'][tuple(entity)]
                     
@@ -171,24 +176,24 @@ class Gamectl:
         moves_all = map(lambda (x, y): (x, loads(y)), bot_move_list)
         tick_time = 20
         
-        bots = vividict()
+        dets = vividict()
         for child in cur_state['bots']:
-            bots[child['botname']][child['childno']] = child
+            dets[child['botname']][child['childno']] = child
         for virus in cur_state['virus']:
-            bots['virus'][tuple(virus)] = None
+            dets['virus'][tuple(virus)] = None
         for food in cur_state['food']:
-            bots['food'][tuple(food)] = None
+            dets['food'][tuple(food)] = None
 
         for name, moves in moves_all:
             for move in moves:
                 childno = move['childno']
-                bot = bots[name][childno]
+                bot = dets[name][childno]
 
                 self.update_direction(bot, move['relativeangle'])
                 self.update_decay(bot)
 
                 if move['ejectmass'] and bot['mass'] >= 20.0:
-                    cur_state['food'].append(self.eject_mass(bot))
+                    dets['food'][self.eject_mass(bot)] = None
 
                 self.update_velocity(bot)
                 if move['pause']:
@@ -196,32 +201,32 @@ class Gamectl:
 
                 if bot['mass'] >= 36.0 and len(moves) < 16 and move['split']:
                     newchildno = self.genchild(bots[name].keys())
-                    cur_state['bots'].append(self.split(bot, newchildno, tick_time))
+                    dets[name][newchildno] = self.split(bot, newchildno, tick_time)
                 
                 self.update_radius(bot)
-                
+
                 ##########
                 #DEBUG THIS
-                food_cnt = len(bots['food'].keys())
-                virus_cnt = len(bots['virus'].keys())
+                food_cnt = len(dets['food'].keys())
+                virus_cnt = len(dets['virus'].keys())
                 
-                self.perform_collisions(bots, cur_state['bots'], cur_state['virus'], cur_state['food'])
+                self.perform_collisions(dets)
 
-                self.add_virus_food(bots, virus_cnt - len(bots['virus'].keys()), food_cnt - len(bots['food'].keys()))
+                self.add_virus_food(dets, virus_cnt - len(dets['virus'].keys()), food_cnt - len(dets['food'].keys()))
 
                 processed_bots = []
-                for bname in bots.keys():
+                for bname in dets.keys():
                     if bname != 'virus' and bname != 'food':
-                        processed_bots.extend(bots[bname].values())
-                processed_food = bots['food'].keys()
-                processed_virus= bots['virus'].keys()
+                        processed_bots.extend(dets[bname].values())
+                processed_food = dets['food'].keys()
+                processed_virus= dets['virus'].keys()
 
                 cur_state['bots'] = processed_bots
                 cur_state['virus'] = processed_virus
                 cur_state['food'] = processed_food
                 # END OF DEBUG THIS
                 ##########
-                
+
                 map(lambda x : collisions.update_position(tick_time, x), cur_state['bots'])
                 map(lambda x : self.update_velocity(x), cur_state['bots'])
                 map(lambda x : self.update_radius(x), cur_state['bots'])

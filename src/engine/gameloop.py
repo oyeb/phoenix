@@ -43,8 +43,8 @@ def initialize_bots(map_text, lst):
                                               'score':0,
                                               'angle':0,
                                               'velocity':0.59,
-                                              'mass':20,
-                                              'radius':100,
+                                              'mass':1000,
+                                              'radius':500,
                                               'childno':0,
                                               'center':(0, randint(0, 2808))}, lst))
 

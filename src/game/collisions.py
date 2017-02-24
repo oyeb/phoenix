@@ -53,12 +53,13 @@ def dist(i, j):
 def point_on_lsegment(line_init_pt, line_end_pt, pt):
     """
     Can only be used in conjuction with closest_point_on_line()
+    precision is 0.01
     """
     
     lx1, ly1 = line_init_pt
     lx2, ly2 = line_end_pt
     x, y = pt
-    return (max(lx1, lx2) >= x >= min(lx1, lx2)) and (max(ly1, ly2) >= y >= min(ly1, ly2))
+    return (max(lx1, lx2)+0.01 >= x >= min(lx1, lx2)-0.01) and (max(ly1, ly2)+0.01 >= y >= min(ly1, ly2)-0.01)
 
 def collision_bot_static_entity(bot, entity, rad):
     '''
@@ -72,13 +73,15 @@ def collision_bot_static_entity(bot, entity, rad):
     d = closest_point_on_line(init, end, entity)
 
     # Trigonometry
-    if point_on_lsegment(init, end, d) and dist(d, entity) <= bot['radius'] and bot['radius'] >= 1.8*rad:
+    if ((point_on_lsegment(init, end, d) and dist(d, entity) <= bot['radius']) or
+        (dist(init, entity) <= bot['radius']) or
+        (dist(end, entity) <= bot['radius'])) and bot['radius'] >= 1.8*rad:
+        
         time_coll = (dist(init, d) - sqrt(bot['radius']**2 - dist(d, entity)**2))/bot['velocity']
         print "[*] Event: bot ate a food or virus"
         return (True, time_coll)
     else:
         return (False, None)
-
 
 def collision_bots_dynamic(bota, botb):
     '''
@@ -97,7 +100,10 @@ def collision_bots_dynamic(bota, botb):
     end = map_restriction((botb['center'][0]+vx*20, botb['center'][1]+vy*20))
     d = closest_point_on_line(init, end, bota['center'])
     
-    if bota['radius'] >= 1.8*botb['radius'] and point_on_lsegment(init, end, d) and dist(d, bota['center']) <= botb['radius']:
+    if ((point_on_lsegment(init, end, d) and dist(d, bota['center']) <= botb['radius']) or
+        (dist(init, bota['center']) <= bota['radius']) or
+        (dist(end, bota['center']) <= bota['radius'])) and bota['radius'] >= 1.8*botb['radius']:
+        
         time_coll = (dist(init, d) - sqrt(botb['radius']**2 - dist(d, bota['radius'])**2))/sqrt(vx**2 + vy**2)
         print "[*] Event: bot another bot"
         return (True, time_coll)
