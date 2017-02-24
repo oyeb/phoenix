@@ -13,12 +13,12 @@ while True:
         mindist = 1000000
         
         for x in range(len(food)):
-            dist=(food[x][0]-bot["Xcoordinate"])**2 + (food[x][1]-bot["Ycoordinate"])**2)
+            dist=(food[x][0]-bot["center"][0])**2 + (food[x][1]-bot["center"][1])**2)
             if(dist<mindist):
                 mindist=dist
                 mincoord = food[x]
         
-        angle = math.degrees(math.atan((bot["Ycoordinate"]-mincoord[1])/(bot["Xcoordinate"]-mincoord[0])))
+        angle = math.degrees(math.atan((bot["center"][1]-mincoord[1])/(bot["center"][0]-mincoord[0])))
 
         game_state.change_direction(bot["childno"],angle)
 
