@@ -31,10 +31,14 @@ class Gamectl:
 
 
     def initialize_bots(self, map_text, lst):
+
+        self.score = {}
+        for bname in lst:
+            self.score[bname] = 0
+            
         prev_state = loads(map_text)
         
         prev_state['bots'] = list(map(lambda x : {'botname':x,
-                                                  'score':0,
                                                   'angle':randint(0, 359),
                                                   'velocity':0.59,
                                                   'mass':20,
@@ -42,6 +46,7 @@ class Gamectl:
                                                   'childno':0,
                                                   'center':(randint(0, prev_state['maxX']), randint(0, prev_state['maxY']))}, lst))
 
+        prev_state['score'] = self.score
         # The '\n' acts as RETURN after the raw_input()
         return dumps(prev_state)+'\n'
 
@@ -145,29 +150,27 @@ class Gamectl:
                 if etype == 'virus' and tuple(entity) in dets['virus']:
                     if len(dets[bname].keys()) == 16:
                         child['mass'] += 70
-                        child['score'] += 70*3
                     else:
                         newchild = self.genchild(dets[bt['botname']].keys())
                         dets[bname][newchild] = deepcopy(child)
                         child['mass'] /= 2.0
                         dets[bname][newchild]['mass'] /= 2.0
+                    self.score[bname] += 70*3
                     del dets['virus'][tuple(entity)]
                     
                 elif etype == 'food' and tuple(entity) in dets['food']:
                     child['mass'] += 2
+                    self.score[bname] += 2
                     del dets['food'][tuple(entity)]
                     
                 elif etype == 'bot' and entity['childno'] in dets[entity['botname']]:
                     bota, botb = child, dets[entity['botname']][entity['childno']]
                     bota, botb = (bota, botb) if bota['radius'] > botb['radius'] else (botb, bota)
                     
-                    if bota['botname'] == botb['botname']:
-                        bota[score] += botb['score']
-                    else:
-                        bota['mass'] += botb['mass']
-                        bota['score'] += 10*botb['mass']    
+                    if bota['botname'] != botb['botname']:
+                        self.score[bota['botname']] += 10*botb['mass']
+                    bota['mass'] += botb['mass']
                     del botb
-
                     
     def add_virus_food(self, dets, cnt_virus, cnt_food):
         for i in range(cnt_virus):
@@ -221,8 +224,6 @@ class Gamectl:
                 
                 self.update_radius(bot)
 
-                ##########
-                #DEBUG THIS
                 food_cnt = len(dets['food'].keys())
                 virus_cnt = len(dets['virus'].keys())
                 
@@ -240,15 +241,13 @@ class Gamectl:
                 cur_state['bots'] = processed_bots
                 cur_state['virus'] = processed_virus
                 cur_state['food'] = processed_food
-                # END OF DEBUG THIS
-                ##########
 
                 for i in cur_state['bots']:
                     i['center'] = collisions.update_position(tick_time, i)
                     
                 map(lambda x : self.update_velocity(x), cur_state['bots'])
                 map(lambda x : self.update_radius(x), cur_state['bots'])
-
+                cur_state['score'] = self.score
         # this \n acts like the RETURN key pressed after entering the input
         # [IMPLEMENT EXCEPTION HANDLING HERE IF THERE WAS NO '\n']
         return dumps(cur_state)+'\n'
