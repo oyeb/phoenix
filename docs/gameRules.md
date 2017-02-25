@@ -68,6 +68,9 @@ on speed of the blob.
 
 + You must print `I'm Poppy!` at the start for your bot to be acknowledged.
 
++ You cannot name your bot `virus` or `food`, if you do your bot will be disqualified
+
+
 **The origial is available [here](http://agar.gcommer.com/index.php?title=Main_Page)**
 
 ---

@@ -145,7 +145,6 @@ class Botctl:
             move =  os.read(self.BOTOUT_PARENT, self.PIPESZ).strip()
         else:
             move = None
-            
         self.moves.append(move)
         return move
 
