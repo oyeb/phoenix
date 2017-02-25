@@ -55,3 +55,21 @@ thus its hard to maintain the mass. Greater the mass, greater the decay.
 + Number of viruses are fixed for a map. If a virus is eaten then it re-emerges imediately.
 
 + Map dimensions (16:9) 4992 X 2808 units <sup>2<sup>
+
++ For each move you get `2 s`, you must make a move within that time otherwise your bot will be
+disqualified. If you make an invalid move, you will be disqualified. Refrain yourself from
+writing anying to STDOUT, because the game engine pipes the STDOUT of the bot to read the moves.
+Feel free to write anyting to `STDERR`, you can use this for debugging purposes. You will get back your
+`STDERR` after running the game on our servers.
+
++ You can change the direction of your bot relative to your current direction
+(+30 <sup>o</sup> or -30 <sup>o</sup>). Changing direction does not have a penalty
+on speed of the blob. 
+
++ You must print `I'm Poppy!` at the start for your bot to be acknowledged.
+
+**The origial is available [here](http://agar.gcommer.com/index.php?title=Main_Page)**
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/3.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 Unported License</a>.
