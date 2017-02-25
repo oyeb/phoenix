@@ -235,6 +235,7 @@ class Gamectl:
                 for bname in dets.keys():
                     if bname != 'virus' and bname != 'food':
                         processed_bots.extend(dets[bname].values())
+                        
                 processed_food = dets['food'].keys()
                 processed_virus= dets['virus'].keys()
 

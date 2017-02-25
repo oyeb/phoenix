@@ -96,12 +96,11 @@ class Botctl:
             # enables non blocking read on the bot's stdin so that the engine can read
             # whenever it wants.
 
-            if self.get_move(2.0) == "I'm Poppy!":
+            if self.get_move(2.0) == "I'm Poppy!" and (self.name != 'virus' and self.name != 'food'):
                 self.valid = True
                 print "[*] {} has been acknowledged.".format(self.name)
             else:
                 print "[*] {} is unresponsive".format(self.name)
-                # self.game_over()
 
     def suspend_bot(self):
         """ Suspends the bot process (if currently active)."""

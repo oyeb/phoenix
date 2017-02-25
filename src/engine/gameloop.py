@@ -49,7 +49,6 @@ def gameloop(args, map_text, timeout, max_iters):
         game_state_log = open('game_state_log.txt', 'w')
         score_log = open('score_log.txt', 'w')
         gslog = []
-        sclog = []
         
         bots = [Botctl(name, arg) for name, arg in args]
         bots = qualified_bots(bots)
@@ -74,7 +73,6 @@ def gameloop(args, map_text, timeout, max_iters):
                     bot.valid = False
             prev_state = game.next_state_continuous(prev_state, moves)
             gslog.append(prev_state)
-            sclog.append(dumps(game.score))
                     
             bots = qualified_bots(bots)
 
@@ -84,7 +82,7 @@ def gameloop(args, map_text, timeout, max_iters):
     finally:
         kill_all(bots)
         game_state_log.write('\n,'.join(gslog))
-        score_log.write('\n'.join(sclog))
+        score_log.write(dumps(game.score, indent=4))
 
         game_state_log.close()
         score_log.close()
