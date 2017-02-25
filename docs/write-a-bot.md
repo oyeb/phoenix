@@ -37,7 +37,8 @@ move. If you are wondering what is happening here and are asking _"Doesn't
 python flush its buffer automatically?"_, normally it does, but we have set the
 size of the pipe buffer to a bigger size (yes we use PIPEs for our IPC), so that
 the buffer is big enough for all your sixteen blobs (if you create 16 blobs by
-split or eating a virus) to make its move.
+split or eating a virus) to make its move. Now in this infinite loop you can add
+your bot operation logic.
 
 Now lets take a look at what is available to us. The only thing that is available
 to us is the `botapi.py`. Make sure that you use the name that you submitted to

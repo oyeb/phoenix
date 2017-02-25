@@ -48,18 +48,29 @@ class game:
     def get_children(self):
         '''
         returns the list dicts with the details of children
+        {
+        'botname':'kevin',
+        'childno':0,
+        'center':[x, y],
+        'mass':20,
+        'angle':0,
+        'radius':10
+        }
         '''
         return filter(lambda x: x['botname'] == self.name, self.game_state['bots'])
     
-    def get_bots(self):
+    def get_blobs(self):
         '''
-        return a list of dicts with bot details:
-        botname,
-        childno,
-        Xcoordinate,
-        mass,
-        angle,
-        score
+        returns a list of dicts of all the blobs other than your bot
+        {
+        'botname':'kevin',
+        'childno':0,
+        'center':[x, y],
+        'mass':20,
+        'angle':0,
+        'radius':10
+        }
+
         '''
         return filter(lambda x: x['botname'] != self.name, self.game_state['bots'])
 
@@ -74,21 +85,3 @@ class game:
         return a list of tuples as x and y coordinates
         '''
         return list(map(lambda x: tuple(x), self.game_state['virus']))
-
-    def get_ffields_circle(self):
-        '''
-        return a list of dicts representing force-field / water-stream circles:
-        innerrad,
-        outerrad,
-        origin
-        '''
-        return self.game_state['ffieldcircle']
-
-    def get_ffields_square(self):
-        '''
-        return a list of dicts representing force-field / water-stream squares:
-        origin,
-        innerside,
-        outerside
-        '''
-        return self.game_state['ffieldsquare']
