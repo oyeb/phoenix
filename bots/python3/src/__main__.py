@@ -1,4 +1,5 @@
 from botapi import game
+import sys
 
 game.send_acknowledgement()
 
@@ -7,7 +8,7 @@ while True:
     
     """
     ============================================================
-    Fill with the game logic that you have to make on each child
+    Fill with the moves that you have to make on each child
     ============================================================
     """
     

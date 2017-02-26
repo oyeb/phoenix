@@ -125,9 +125,9 @@ class Gamectl:
         for i in range(len(bots)):
             for j in range(len(bots)):
                 if i < j:
-                    a, b = collisions.collision_bots_dynamic(bots[i], bots[j])
-                    if a:
-                        collsb.append(b, 'bot', bots[i], bots[j])
+                    choice, t = collisions.collision_bots_dynamic(bots[i], bots[j])
+                    if choice:
+                        collsb.append((t, 'bot', bots[i], bots[j]))
         return collsb
 
     def perform_collisions(self, dets):

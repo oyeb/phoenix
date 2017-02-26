@@ -3,7 +3,7 @@ import sys
 
 class game:
     def __init__(self, name):
-        self.game_state = loads(raw_input())
+        self.game_state = loads(input())
         self.name = name
         self.move_obj = {}
         for bot in self.game_state['bots']:
@@ -44,15 +44,7 @@ class game:
         '''
         returns a move object in json format for all the children together
         '''
-        print dumps(self.move_obj.values())
-        sys.stdout.flush()
-
-    @staticmethod
-    def send_acknowledgement():
-        '''
-        prints `I'm Poppy!` to STDOUT so that the engine can acknowledge the bot
-        '''
-        print "I'm Poppy!"
+        print(dumps(list(self.move_obj.values())))
         sys.stdout.flush()
 
     def get_children(self):
@@ -67,7 +59,7 @@ class game:
         'radius':10
         }
         '''
-        return filter(lambda x: x['botname'] == self.name, self.game_state['bots'])
+        return list(filter(lambda x: x['botname'] == self.name, self.game_state['bots']))
     
     def get_blobs(self):
         '''
@@ -82,7 +74,7 @@ class game:
         }
 
         '''
-        return filter(lambda x: x['botname'] != self.name, self.game_state['bots'])
+        return list(filter(lambda x: x['botname'] != self.name, self.game_state['bots']))
 
     def get_foods(self):
         '''
@@ -95,3 +87,11 @@ class game:
         return a list of tuples as x and y coordinates
         '''
         return list(map(lambda x: tuple(x), self.game_state['virus']))
+
+    @staticmethod
+    def send_acknowledgement():
+        '''
+        prints `I'm Poppy!` to STDOUT so send an acknoledgement to the engine
+        '''
+        print("I'm Poppy!")
+        sys.stdout.flush()

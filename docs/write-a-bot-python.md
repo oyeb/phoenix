@@ -1,18 +1,18 @@
-# Writing a bot (in Python)
+# Writing a bot (in Python3)
 
 You can technically write a bot in any language, but we only have
-Python2 API ready. We'll go through the entire code step by step.
+Python(2 and 3) API ready. We'll go through the entire code step by step.
 
 ## Prerequisites
 
 + You should have read the `gameRules.md` and `diff-agario-bitjitsu.md`
-+ You should know Python.
++ You should know Python(2 or 3 which ever you want to use).
 
 ## Explanation
 The basic bot comes in a nice structure.
 
 ```
-python2/
+python3/
 └── src
     ├── botapi.py
     ├── __init__.py
@@ -23,27 +23,17 @@ python2/
 ```
 
 The bot starts its execution in `__main__.py`. The first line imports a `game`
-class from `botapi.py`. The next line we just import the good old `sys` module
-(it is a builtin module). Then, we print `I'm Poppy!` (with a newline
-character at the end). Every bot has to do this as its first move for the
-engine to acknowledge the bot. Then in an infinite loop, we get the input with
-`raw_input()` this is a `JSON` object of the current state. You don't have to
-worry what that is, all you have to do is create an object of class `game` with
-the paramater to its constructor as the name of the bot that you gave when you
-submitted and a string that you got from `STDIN`. You must have noticed that
-we are doing an explicit `flush`  after each `print` statement this is because
-only when you flush the buffer, the engine gets to know that you have made a
-move. If you are wondering what is happening here and are asking _"Doesn't 
-python flush its buffer automatically?"_, normally it does, but we have set the
-size of the pipe buffer to a bigger size (yes we use PIPEs for our IPC), so that
-the buffer is big enough for all your sixteen blobs (if you create 16 blobs by
-split or eating a virus) to make its move. Now in this infinite loop you can add
-your bot operation logic.
+class from `botapi.py`. There is a static method `send_acknowledgement()`, this
+sends a string `I'm Poppy!` after which, the engine acknowledges the bot. Every
+bot has to do this as its first move. Then in an infinite loop, we have to
+create an object of class `game` with the paramater to its constructor as the
+name of the bot that you gave when you submitted. Now in this infinite loop you
+can add your bot operation logic and then call the method `game.make_move()`.
 
 Now lets take a look at what is available to us. The only thing that is available
 to us is the `botapi.py`. Make sure that you use the name that you submitted to
-server and the name that you are using are the same ones (even the case).
-Otherwise you bot will just fail.
+server when you create the object. If you use an invalid name, you will be
+disqualified from that particular match.
 
 ## The list of queries that you can make about the current `Game-State`
 
@@ -88,10 +78,13 @@ operation.
 + `game.pause(childno)` this makes the particular blob to perform the pause
 operation.
 
-## Finally,
+## Other important ones
 
-+ **`game.make_move()` this generates a `JSON` string of the move of all the
-blobs. You print this to `STDOUT` and flush the buffer.
++ **game.send_acknowledgement()** this sends an acknowledgement to the engine,
+then the bot is allowed to make moves.
+
++ **game.send_move()** this generates a `JSON` string of the move of all the
+blobs, prints to the `STDOUT` and then flushes the buffer explicitly.
 
 ### Note:
 
