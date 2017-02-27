@@ -5,7 +5,7 @@ from jsonschema import Draft4Validator
 from vividict import vividict
 from copy import deepcopy
 from math import sin, cos, radians
-from random import randint
+from random import randint, sample
 
 class Gamectl:
     def is_valid_move(self, prev_state, bot_move):
@@ -16,35 +16,22 @@ class Gamectl:
         
         try:
             move = loads(bot_move)
-            game_state = loads(prev_state)
             Draft4Validator(loads(move_schema)).validate(move)
         except Exception as e:
             print "[*] Exception: {}".format(e.message)
             return False
         else:
-            chld_prev_state = sorted(set(list(map(lambda x: x['childno'], game_state['bots']))))
-            chld_move = sorted(list(map(lambda x: x['childno'], move)))
-            if chld_move == chld_prev_state:
-                return True
-            else:
-                return False
-
+            return True
 
     def initialize_bots(self, map_text, lst):
-
         self.score = {}
         for bname in lst:
             self.score[bname] = 0
             
         prev_state = loads(map_text)
         
-        prev_state['bots'] = list(map(lambda x : {'botname':x,
-                                                  'angle':randint(0, 359),
-                                                  'velocity':0.59,
-                                                  'mass':20,
-                                                  'radius':10,
-                                                  'childno':0,
-                                                  'center':(randint(0, prev_state['maxX']), randint(0, prev_state['maxY']))}, lst))
+        prev_state['bots'] = [{'botname':lst[0], 'childno':0, 'angle':0, 'mass':50, 'radius':25, 'center':(0, 1000), 'velocity':1.0},
+                              {'botname':lst[1], 'childno':0, 'angle':180, 'mass':150, 'radius':50, 'center':(1000, 1000), 'velocity':1.0}]
 
         prev_state['score'] = self.score
         # The '\n' acts as RETURN after the raw_input()
@@ -123,11 +110,10 @@ class Gamectl:
         
         collsb = []
         for i in range(len(bots)):
-            for j in range(len(bots)):
-                if i < j:
-                    choice, t = collisions.collision_bots_dynamic(bots[i], bots[j])
-                    if choice:
-                        collsb.append((t, 'bot', bots[i], bots[j]))
+            for j in range(i+1, len(bots)):
+                choice, t = collisions.collision_bots_dynamic(bots[i], bots[j])
+                if choice:
+                    collsb.append((t, 'bot', bots[i], bots[j]))
         return collsb
 
     def perform_collisions(self, dets):
@@ -155,6 +141,8 @@ class Gamectl:
                         dets[bname][newchild] = deepcopy(child)
                         child['mass'] /= 2.0
                         dets[bname][newchild]['mass'] /= 2.0
+                        self.update_direction(dets[bname][newchild], 180)
+                        
                     self.score[bname] += 70*3
                     del dets['virus'][tuple(entity)]
                     
@@ -170,7 +158,7 @@ class Gamectl:
                     if bota['botname'] != botb['botname']:
                         self.score[bota['botname']] += 10*botb['mass']
                     bota['mass'] += botb['mass']
-                    del botb
+                    del dets[botb['botname']][botb['childno']]
                     
     def add_virus_food(self, dets, cnt_virus, cnt_food):
         for i in range(cnt_virus):
@@ -231,10 +219,13 @@ class Gamectl:
 
                 self.add_virus_food(dets, virus_cnt - len(dets['virus'].keys()), food_cnt - len(dets['food'].keys()))
 
-                processed_bots = []
-                for bname in dets.keys():
-                    if bname != 'virus' and bname != 'food':
-                        processed_bots.extend(dets[bname].values())
+                try:
+                    processed_bots = []
+                    for bname in dets.keys():
+                        if bname != 'virus' and bname != 'food' and len(dets[bname].keys())>0:
+                            processed_bots.extend(dets[bname].values())
+                except Exception as e:
+                    print "Hey there: {}".format(e.message)
                         
                 processed_food = dets['food'].keys()
                 processed_virus= dets['virus'].keys()

@@ -56,9 +56,6 @@ def gameloop(args, map_text, timeout, max_iters):
         prev_state = game.initialize_bots(map_text, [name for name, arg in args])
         
         for i in tqdm(xrange(max_iters)):
-            if len(bots) <= 1:
-                break
-            
             update_and_suspend_all(bots, prev_state)
             
             moves = []
