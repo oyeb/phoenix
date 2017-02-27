@@ -1,0 +1,23 @@
+{
+    "bots": [
+        ["kevin", ["/usr/bin/python2", "python2", "/home/ananya/gits/anokha17/phoenix/bots/py2_bot.py"]],
+        ["joker", ["/usr/bin/python3", "python3", "/home/ananya/gits/anokha17/phoenix/bots/py3_bot.py"]]
+    ],
+    "map": "/home/ananya/gits/anokha17/phoenix/maps/fakemap.json",
+    "arena" : "/home/ananya/gits/anokha17/phoenix/arena_a",
+    "filenames" : {
+        "error" : "elog.json",
+        "debug" : "dlog.json",
+        "replay" : "replay.json",
+        "move" : "moves.json"
+    },
+    "commit_paths" : {
+        "error" : "/home/ananya/gits/anokha17/phoenix/out/errorlogs",
+        "debug" : "/home/ananya/gits/anokha17/phoenix/out/debuglogs",
+        "replay" : "/home/ananya/gits/anokha17/phoenix/out/replays",
+        "move" : "/home/ananya/gits/anokha17/phoenix/out/movelogs"
+    },
+    "max_iters" : 100,
+    "timeout" : 2,
+    "api_dir" : "/home/ananya/gits/anokha17/phoenix/api"
+}
