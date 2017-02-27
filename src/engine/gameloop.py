@@ -11,6 +11,7 @@ from time import sleep
 from json import loads, dumps
 from random import randint
 from tqdm import tqdm
+import os.path, shutil
 
 def suspend_all(lst):
     map(lambda x: x.suspend_bot(), lst)
@@ -47,23 +48,84 @@ def kill_by_names(names_bot, lst):
 def is_some_bot_alive(lst):
     return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst), False)
 
-def gameloop(args, map_text, timeout, max_iters):
+def check_config(bots, mapfile, arena, commit_paths, api_dir):
+    if not os.path.isdir(api_dir):
+        raise Exception("Bad configuration, check path to %s" % api_dir)
+    for key in commit_paths:
+        commit_path = commit_paths[key]
+        if not os.path.isdir(commit_path):
+            raise Exception("Bad configuration, check path to %s" % commit_path)
+    for bot in bots:
+        if not os.path.exists(bot[1][2]):
+            raise Exception("Bad configuration, check path to source code of '%s'." % bot[0])
+    if not os.path.exists(mapfile):
+        raise Exception("Bad configuration, check path to mapfile '%s'." % mapfile)
+
+def setup_arena(arena, bots, api_dir):
+    shutil.rmtree(os.path.join(arena, 'logs'), ignore_errors=True)
+    shutil.rmtree(os.path.join(arena, 'bots'), ignore_errors=True)
+    os.mkdir(os.path.join(arena, 'logs'))
+    os.mkdir(os.path.join(arena, 'bots'))
+    for bot in bots:
+        shutil.copytree(
+            os.path.join(api_dir, bot[1][1]),
+            os.path.join(arena, 'bots', bot[0])
+        )
+        shutil.copyfile(bot[1][2], os.path.join(arena, 'bots', bot[0], 'src', '__main__.py'))
+
+def commit(bots, logfolder, filenames, commit_paths):
+    err_log = {}
+    dbg_log = {}
+    mov_log = {}
+    for bot in bots:
+        err_log[bot.name] = open(os.path.join(logfolder, 'error_{0}'.format(bot.name)), 'r').read().strip().split('\n')
+        dbg_log[bot.name] = open(os.path.join(logfolder, 'debug_{0}'.format(bot.name)), 'r').read().strip().split('\n')
+        mov_log[bot.name] = open(os.path.join(logfolder, 'move_{0}'.format(bot.name)), 'r').read().strip().split('\n')
+
+    elog = open(os.path.join(commit_paths['error'], filenames['error']), 'w')
+    elog.write(dumps(err_log, indent=2))
+    elog.close()
+    dlog = open(os.path.join(commit_paths['debug'], filenames['debug']), 'w')
+    dlog.write(dumps(dbg_log, indent=2))
+    dlog.close()
+    mlog = open(os.path.join(commit_paths['move'], filenames['move']), 'w')
+    mlog.write(dumps(mov_log, indent=2))
+    mlog.close()
+    # move replay
+    shutil.copyfile(
+        os.path.join(logfolder, 'replay'),
+        os.path.join(commit_paths['replay'], filenames['replay'])
+    )
+
+def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames):
     """
     This is the game loop, it takes the moves, processes it, writes the new
     state to the medium (here pipe).
     """
-    
+    logfolder = os.path.join(arena, 'logs')
+    # need to use paths inside the arena. bot_args is same as args(of code
+    # before) and bots, except that the path is changed
+    bot_args = [
+    (
+        bot[0],
+        [
+            bot[1][0],
+            bot[1][1],
+            os.path.join(arena, 'bots', bot[0], 'src').encode()
+        ]
+    ) for bot in bots]
+
     try:
         game = Gamectl()
-        args = map(tuple, args)
+        args = map(tuple, bot_args)
         
-        game_state_log = open('game_state_log.txt', 'w')
-        score_log = open('score_log.txt', 'w')
+        game_state_log = open(os.path.join(logfolder, 'replay'), 'w')
         gslog = []
         
-        bots = [Botctl(name, arg) for name, arg in args]
+        bots = [Botctl(name, arg, logfolder) for name, arg in args]
         bots = qualified_bots(bots)
-                        
+
+        map_text = open(mapfile, 'r').read().strip()
         prev_state = game.initialize_bots(map_text, [name for name, arg in args])
         
         for i in tqdm(xrange(max_iters)):
@@ -86,16 +148,17 @@ def gameloop(args, map_text, timeout, max_iters):
             bots = qualified_bots(bots)
 
     except Exception as e:
-        print '[*] Exception: {}'.format(e.message)
+        print '[*] Exception: {}'.format(e)
 
     finally:
         kill_all(bots)
-        game_state_log.write('\n,'.join(gslog))
-        score_log.write(dumps(game.score, indent=4))
-
+        # Will merge and move all logs from the arena, basically making it free
+        # again.
+        game_state_log.write("var ob = ")
+        game_state_log.write(dumps(gslog, indent=2))
+        game_state_log.write(";")
         game_state_log.close()
-        score_log.close()
-    
-        print '='*80
-        print 'Game Over'.center(80)
-        print '='*80
+
+        commit(bots, logfolder, filenames, commit_paths)
+        summary = dumps(game.score, indent=2)
+        return summary

@@ -5,7 +5,7 @@
 # For the full copyright and license information, please view the LICENSE file
 # that was distributed with is source code.
 
-import os
+import os, os.path
 from signal import SIGCONT, SIGSTOP, SIGTERM, SIGINT
 from time import sleep
 from resource import setrlimit, RLIMIT_AS
@@ -30,16 +30,22 @@ class BotState:
 
 # defined as sky
 class Botctl:
-    def __init__(self, name, args, timeout=2.0, mem_limit=10**9):
-        """Launches the bot process. timeout (seconds, float accepted) is the 
-        time for which the engine waits for the bot to acknowledge i.e. send
-        "I'm Poppy!" in the medium (anonymous pipe here). args should be a list,
-        example: ['/usr/bin/python', 'python', 'bot1.py'] this will be 
-        directly executed with execlp. mem_limit is the memory limit in bytes. 
-        It also initiates the seccomp-bpf filter to restrict the system calls
-        that can be used by the bot. Resources such as stack and heap or the
-        whole memory is given an upper limit here. We also pipe the STDIN and
-        STDOUT of the bot to some file that can be manipulated by the engine.
+    def __init__(self, name, args, logfolder, timeout=2.0, mem_limit=10**9):
+        """
+        Launches the bot process. timeout (seconds, float accepted) is the time
+        for which the engine waits for the bot to acknowledge i.e. send
+        "I'm Poppy!" in the medium (anonymous pipe here).
+        
+        args should be a list, example: ['/usr/bin/python', 'python', 'bot1.py']
+        this will be directly executed with execlp.
+       
+        logfolder is where the logs need to be put
+
+        mem_limit is the memory limit in bytes. It also initiates the
+        seccomp-bpf filter to restrict the system calls that can be used by the
+        bot. Resources such as stack and heap or the whole memory is given an
+        upper limit here. We also pipe the STDIN and STDOUT of the bot to some
+        file that can be manipulated by the engine.
         """
 
         # Hard coded pipe size
@@ -58,7 +64,7 @@ class Botctl:
         fcntl.fcntl(self.BOTIN_PARENT, fcntl.F_SETPIPE_SZ, self.PIPESZ)
 
         # the stderr is redirected here and logged
-        self.bot_err_log = open('bot_err_log{}.txt'.format(self.name), 'w')
+        self.bot_debug_log = open(os.path.join(logfolder, 'debug_{0}'.format(self.name)), 'w')
 
         self.moves = []
         self.bot_status = BotState.active
@@ -73,9 +79,9 @@ class Botctl:
 
             os.dup2(self.BOTIN_CHILD, sys.stdin.fileno())
             os.dup2(self.BOTOUT_CHILD, sys.stdout.fileno())
-            os.dup2(self.bot_err_log.fileno(), sys.stderr.fileno())
+            os.dup2(self.bot_debug_log.fileno(), sys.stderr.fileno())
 
-            self.bot_err_log.close()            
+            self.bot_debug_log.close()            
             
             # This lime sets 1 GiB of memory per process. It limits the whole
             # memory, but limiting stack and heap size is not done explicitly.
@@ -85,13 +91,14 @@ class Botctl:
         else:
             os.close(self.BOTIN_CHILD)
             os.close(self.BOTOUT_CHILD)
-            self.bot_err_log.close()
+            self.bot_debug_log.close()
 
             flg = fcntl.fcntl(self.BOTOUT_PARENT, fcntl.F_GETFL)
             fcntl.fcntl(self.BOTOUT_PARENT, fcntl.F_SETFL, flg | os.O_NONBLOCK) 
             
             self.botin = os.fdopen(self.BOTIN_PARENT, 'w')
-            self.bot_move_log = open('bot_move_log{}.txt'.format(self.name), 'w')
+            self.bot_move_log = open(os.path.join(logfolder, 'move_{0}'.format(self.name)), 'w')
+            self.bot_error_log = open(os.path.join(logfolder, 'error_{0}'.format(self.name)), 'w')
 
             # enables non blocking read on the bot's stdin so that the engine can read
             # whenever it wants.
@@ -165,6 +172,8 @@ class Botctl:
 
         self.moves = map(lambda x: '' if x == None else x, self.moves)
         self.bot_move_log.write('\n'.join(self.moves))
+        self.bot_move_log.close()
+        self.bot_error_log.close()
 
     def game_over(self):
         """When a bot is unable to make a move it is said to be "defeated".
@@ -175,7 +184,6 @@ class Botctl:
         print '[*] {} died!'.format(self.name)
         
         self.append_logs()
-        self.bot_move_log.close()
 
         self.kill_bot()
         os.close(self.BOTOUT_PARENT)
