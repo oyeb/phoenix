@@ -30,9 +30,13 @@ class Gamectl:
             
         prev_state = loads(map_text)
         
-        prev_state['bots'] = [{'botname':lst[0], 'childno':0, 'angle':0, 'mass':50, 'radius':25, 'center':(0, 1000), 'velocity':1.0},
-                              {'botname':lst[1], 'childno':0, 'angle':180, 'mass':150, 'radius':50, 'center':(1000, 1000), 'velocity':1.0}]
-
+        prev_state['bots'] = list(map(lambda x : {'botname':x,
+                                                  'angle':randint(0, 359),
+                                                  'velocity':0.59,
+                                                  'mass':20,
+                                                  'radius':10,
+                                                  'childno':0,
+                                                  'center':(randint(0, prev_state['maxX']), randint(0, prev_state['maxY']))}, lst))
         prev_state['score'] = self.score
         # The '\n' acts as RETURN after the raw_input()
         return dumps(prev_state)+'\n'
