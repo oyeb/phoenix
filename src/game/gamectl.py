@@ -29,7 +29,6 @@ class Gamectl:
             self.score[bname] = 0
             
         prev_state = loads(map_text)
-        
         prev_state['bots'] = list(map(lambda x : {'botname':x,
                                                   'angle':randint(0, 359),
                                                   'velocity':0.59,
@@ -64,7 +63,6 @@ class Gamectl:
         Bring this particular child to halt
         """
         bot['velocity'] = 0
-        
 
     def eject_mass(self, bot):
         ejectangle = (bot['angle'] + 180) % 360
@@ -92,6 +90,7 @@ class Gamectl:
         nbot['mass'] = bot['mass']
         nbot['radius'] = bot['radius']
         nbot['velocity'] = bot['velocity']
+        return nbot
 
     def colls_entities(self, bots, entity, rad):
         '''
@@ -120,6 +119,15 @@ class Gamectl:
                     collsb.append((t, 'bot', bots[i], bots[j]))
         return collsb
 
+    def eat_virus(self, bot, newchildno):
+        nbot = deepcopy(bot)
+        nbot['childno'] = newchildno
+        nbot['mass'] /= 2.0
+        nbot['mass'] += 35
+        bot['mass'] /= 2.0
+
+        return nbot
+
     def perform_collisions(self, dets):
         bots = []
         for bname in dets.keys():
@@ -138,23 +146,19 @@ class Gamectl:
                 child = dets[bname][bt['childno']]
                 
                 if etype == 'virus' and tuple(entity) in dets['virus']:
-                    if len(dets[bname].keys()) == 16:
-                        child['mass'] += 70
-                    else:
-                        newchild = self.genchild(dets[bt['botname']].keys())
-                        dets[bname][newchild] = deepcopy(child)
-                        child['mass'] /= 2.0
-                        dets[bname][newchild]['mass'] /= 2.0
-                        self.update_direction(dets[bname][newchild], 180)
-                        
+                    dets[bname][child['childno']]['mass'] += 35
                     self.score[bname] += 70*3
                     del dets['virus'][tuple(entity)]
+                    
+                    if len(dets[bname].keys()) < 16:
+                        newchildno = self.genchild(dets[bname].keys())
+                        dets[bname][newchildno] = self.eat_virus(child, newchildno)
                     
                 elif etype == 'food' and tuple(entity) in dets['food']:
                     child['mass'] += 2
                     self.score[bname] += 2
                     del dets['food'][tuple(entity)]
-                    
+
                 elif etype == 'bot' and entity['childno'] in dets[entity['botname']]:
                     bota, botb = child, dets[entity['botname']][entity['childno']]
                     bota, botb = (bota, botb) if bota['radius'] > botb['radius'] else (botb, bota)
@@ -211,7 +215,7 @@ class Gamectl:
                     self.pause(bot)
 
                 if bot['mass'] >= 36.0 and len(moves) < 16 and move['split']:
-                    newchildno = self.genchild(bots[name].keys())
+                    newchildno = self.genchild(dets[name].keys())
                     dets[name][newchildno] = self.split(bot, newchildno, tick_time)
                 
                 self.update_radius(bot)
