@@ -93,3 +93,5 @@ ENV/
 # phoenix-specific
 
 arena*
+*config.json
+out/*

@@ -154,7 +154,9 @@ def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames):
         kill_all(bots)
         # Will merge and move all logs from the arena, basically making it free
         # again.
+        game_state_log.write("var ob = ")
         game_state_log.write(dumps(gslog, indent=2))
+        game_state_log.write(";")
         game_state_log.close()
 
         commit(bots, logfolder, filenames, commit_paths)
