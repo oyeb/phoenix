@@ -1,12 +1,10 @@
 from botapi import game
 import sys
 
-print "I'm Poppy!"
-sys.stdout.flush()
+game.send_acknowledgement()
 
 while True:
-    gs_json = raw_input()
-    game_state = game(gs_json, 'kevin')
+    game_state = game('joker')
     
     """
     ============================================================
@@ -14,5 +12,4 @@ while True:
     ============================================================
     """
     
-    print game_state.make_move()
-    sys.stdout.flush()
+    game_state.send_move()

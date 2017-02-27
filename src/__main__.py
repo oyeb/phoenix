@@ -3,9 +3,9 @@
 # Copyright (c) 2016, 2017 Vasantha Ganesh K.
 #
 # For the full copyright and license information, please view the LICENSE file
-# that was distributed with is source code.
+# that was distributed with this source code.
 
-from engine.gameloop import gameloop
+from engine.gameloop import setup_arena, gameloop, check_config, commit
 from json import loads
 import os
 
@@ -15,13 +15,33 @@ if __name__ == "__main__":
     print "="*80
 
     cdir = os.path.dirname(os.path.realpath('__file__'))
-    a = open(os.path.join(cdir, "bots_config.json"), 'r')
-    bot_start_config = map(loads, a.read().strip().split('\n'))
-
-    b = open(os.path.join(cdir, "map_config.json"), 'r')
-    map_text = open(loads(b.read().strip()), 'r').read()
+    config_file = open(os.path.join(cdir, "config.json"), 'r')
+    game_config = loads(config_file.read().strip())
     
-    # This line acts like pressing the RETURN key raw_input()
-    # map_text += '\n'
+    check_config(
+        game_config['bots'],
+        game_config['map'],
+        game_config['arena'],
+        game_config['commit_paths'],
+        game_config['api_dir']
+    )
+    setup_arena(
+        game_config['arena'],
+        game_config['bots'],
+        game_config['api_dir']
+    )
 
-    gameloop(bot_start_config, map_text, 2.0, 100)
+    summary = gameloop(
+        game_config['bots'],
+        game_config['map'],
+        game_config['timeout'],
+        game_config['max_iters'],
+        game_config['arena'],
+        game_config['commit_paths'],
+        game_config['filenames']
+    )
+
+    print '='*80
+    print 'Game Summary'.center(80)
+    print '='*80
+    print summary

@@ -1,8 +1,9 @@
 from json import loads, dumps
+import sys
 
 class game:
-    def __init__(self, json_text, name):
-        self.game_state = loads(json_text)
+    def __init__(self, name):
+        self.game_state = loads(input())
         self.name = name
         self.move_obj = {}
         for bot in self.game_state['bots']:
@@ -39,29 +40,41 @@ class game:
         '''
         self.move_obj[child_no]['pause'] = True
 
-    def make_move(self):
+    def send_move(self):
         '''
         returns a move object in json format for all the children together
         '''
-        return dumps(self.move_obj.values())
+        print(dumps(list(self.move_obj.values())))
+        sys.stdout.flush()
 
     def get_children(self):
         '''
         returns the list dicts with the details of children
+        {
+        'botname':'kevin',
+        'childno':0,
+        'center':[x, y],
+        'mass':20,
+        'angle':0,
+        'radius':10
+        }
         '''
-        return filter(lambda x: x['botname'] == self.name, self.game_state['bots'])
+        return list(filter(lambda x: x['botname'] == self.name, self.game_state['bots']))
     
-    def get_bots(self):
+    def get_blobs(self):
         '''
-        return a list of dicts with bot details:
-        botname,
-        childno,
-        Xcoordinate,
-        mass,
-        angle,
-        score
+        returns a list of dicts of all the blobs other than your bot
+        {
+        'botname':'kevin',
+        'childno':0,
+        'center':[x, y],
+        'mass':20,
+        'angle':0,
+        'radius':10
+        }
+
         '''
-        return filter(lambda x: x['botname'] != self.name, self.game_state['bots'])
+        return list(filter(lambda x: x['botname'] != self.name, self.game_state['bots']))
 
     def get_foods(self):
         '''
@@ -75,20 +88,10 @@ class game:
         '''
         return list(map(lambda x: tuple(x), self.game_state['virus']))
 
-    def get_ffields_circle(self):
+    @staticmethod
+    def send_acknowledgement():
         '''
-        return a list of dicts representing force-field / water-stream circles:
-        innerrad,
-        outerrad,
-        origin
+        prints `I'm Poppy!` to STDOUT so send an acknoledgement to the engine
         '''
-        return self.game_state['ffieldcircle']
-
-    def get_ffields_square(self):
-        '''
-        return a list of dicts representing force-field / water-stream squares:
-        origin,
-        innerside,
-        outerside
-        '''
-        return self.game_state['ffieldsquare']
+        print("I'm Poppy!")
+        sys.stdout.flush()

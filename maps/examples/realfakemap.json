@@ -1,34 +1,4 @@
-{
-    "bots": [
-	{
-	    "botname": "kevin",
-	    "childno": 0,
-	    "Xcoordinate": 25,
-	    "Ycoordinate": 30,
-	    "mass": 20,
-	    "angle": 180,
-	    "score":150
-	},
-	{
-	    "botname": "kevin",
-	    "childno": 1,
-	    "Xcoordinate": 5,
-	    "Ycoordinate": 30,
-	    "mass": 22,
-	    "angle": 18,
-	    "score":150
-	},
-	{
-	    "botname": "juno",
-	    "childno": 0,
-	    "Xcoordinate": 23,
-	    "Ycoordinate": 600,
-	    "mass": 60,
-	    "angle": 45,
-	    "score":90
-	}
-    ],
-    
+{    
     "maxX": 14142,
     "maxY": 14142,
 
@@ -38,7 +8,6 @@
 	     [78, 345],
 	     [89, 233]],
 
-    "virusrad": 15,
     "virus":[[123, 45],
 	     [3455, 34],
 	     [333, 77],
@@ -53,6 +22,7 @@
 		    {"innerrad": 30,
 		      "outerrad": 50,
 		      "origin": [6790, 88]}],
+
     "ffieldsquare": [{"origin": [233, 7888],
 		      "innerside": 90,
 		      "outerside": 110}]

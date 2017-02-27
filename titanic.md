@@ -1,4 +1,4 @@
-# Titanic (bot-api that the contestants can use)
+# Titanic (bot-api that the contestants can use language independent)
 
 ## Setters (or the functions that affect the state)
 
@@ -20,4 +20,6 @@
 
    + **get_viruses()**: returns a list of tuples with virus coordinates.
 
-   + **get_ffields()**: returns a list of dicts representing force-field/water-stream coordinates and other details.
+   + **get_blobs()**: returns a list of all the blobs that do not belong to you.
+
+   + **get_children()**: returns a list of all the blobs that belong to you.

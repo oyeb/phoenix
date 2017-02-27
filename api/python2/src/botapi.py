@@ -1,15 +1,17 @@
 from json import loads, dumps
+import sys
 
 class game:
-    def __init__(self, json_text, name):
-        self.game_state = loads(json_text)
+    def __init__(self, name):
+        self.game_state = loads(raw_input())
         self.name = name
         self.move_obj = {}
         for bot in self.game_state['bots']:
             if bot['botname'] == self.name:
                 self.move_obj[bot['childno']] = {
+                    'childno': bot['childno'],
                     'relativeangle':0,
-                    'ejectmass':0,
+                    'ejectmass':False,
                     'split':False,
                     'pause':False}
         
@@ -38,27 +40,47 @@ class game:
         '''
         self.move_obj[child_no]['pause'] = True
 
-    def make_move(self):
+    def send_move(self):
         '''
         returns a move object in json format for all the children together
         '''
-        return dumps(self.move_obj)
+        print dumps(self.move_obj.values())
+        sys.stdout.flush()
+
+    @staticmethod
+    def send_acknowledgement():
+        '''
+        prints `I'm Poppy!` to STDOUT so that the engine can acknowledge the bot
+        '''
+        print "I'm Poppy!"
+        sys.stdout.flush()
 
     def get_children(self):
         '''
         returns the list dicts with the details of children
+        {
+        'botname':'kevin',
+        'childno':0,
+        'center':[x, y],
+        'mass':20,
+        'angle':0,
+        'radius':10
+        }
         '''
         return filter(lambda x: x['botname'] == self.name, self.game_state['bots'])
     
-    def get_bots(self):
+    def get_blobs(self):
         '''
-        return a list of dicts with bot details:
-        botname,
-        childno,
-        Xcoordinate,
-        mass,
-        angle,
-        score
+        returns a list of dicts of all the blobs other than your bot
+        {
+        'botname':'kevin',
+        'childno':0,
+        'center':[x, y],
+        'mass':20,
+        'angle':0,
+        'radius':10
+        }
+
         '''
         return filter(lambda x: x['botname'] != self.name, self.game_state['bots'])
 
@@ -73,21 +95,3 @@ class game:
         return a list of tuples as x and y coordinates
         '''
         return list(map(lambda x: tuple(x), self.game_state['virus']))
-
-    def get_ffields_circle(self):
-        '''
-        return a list of dicts representing force-field / water-stream circles:
-        innerrad,
-        outerrad,
-        origin
-        '''
-        return self.game_state['ffieldcircle']
-
-    def get_ffields_square(self):
-        '''
-        return a list of dicts representing force-field / water-stream squares:
-        origin,
-        innerside,
-        outerside
-        '''
-        return self.game_state['ffieldsquare']

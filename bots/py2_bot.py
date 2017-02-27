@@ -1,14 +1,14 @@
 from botapi import game
-import sys
+
+game.send_acknowledgement()
 
 while True:
-    game_state = game(input(), 'kevin')
+    game_state = game('kevin')
     
     """
     ============================================================
-    Fill with the moves that you have to make on each child
+    Fill with the game logic that you have to make on each child
     ============================================================
     """
-
-    print(game_state.make_move())
-    sys.stdout.flush()
+    
+    game_state.send_move()
