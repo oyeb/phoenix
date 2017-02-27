@@ -33,6 +33,17 @@ def qualified_bots(lst):
 def kill_all(lst):
     map(lambda x: x.game_over(), lst)
 
+def kill_by_names(names_bot, lst):
+    '''
+    this method allows the game to kill a bot. This method should also log to
+    the err_log
+    '''
+    
+    for bot in lst:
+        for name_bot in names_bot:
+            if bot.name == name_bot:
+                bot.valid = False
+
 def is_some_bot_alive(lst):
     return reduce(lambda x, y: x and y, map(lambda x: x.is_alive(), lst), False)
 
@@ -56,9 +67,6 @@ def gameloop(args, map_text, timeout, max_iters):
         prev_state = game.initialize_bots(map_text, [name for name, arg in args])
         
         for i in tqdm(xrange(max_iters)):
-            if len(bots) <= 1:
-                break
-            
             update_and_suspend_all(bots, prev_state)
             
             moves = []
@@ -71,7 +79,8 @@ def gameloop(args, map_text, timeout, max_iters):
                     moves.append((bot.name, move))
                 else:
                     bot.valid = False
-            prev_state = game.next_state_continuous(prev_state, moves)
+            prev_state, to_kill = game.next_state_continuous(prev_state, moves)
+            kill_by_names(to_kill, bots)
             gslog.append(prev_state)
                     
             bots = qualified_bots(bots)
