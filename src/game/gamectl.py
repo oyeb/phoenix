@@ -219,13 +219,13 @@ class Gamectl:
 
                 self.add_virus_food(dets, virus_cnt - len(dets['virus'].keys()), food_cnt - len(dets['food'].keys()))
 
-                try:
-                    processed_bots = []
-                    for bname in dets.keys():
-                        if bname != 'virus' and bname != 'food' and len(dets[bname].keys())>0:
-                            processed_bots.extend(dets[bname].values())
-                except Exception as e:
-                    print "Hey there: {}".format(e.message)
+                processed_bots = []
+                to_kill = []
+                for bname in dets.keys():
+                    if bname != 'virus' and bname != 'food' and len(dets[bname].keys())>0:
+                        processed_bots.extend(dets[bname].values())
+                    elif len(dets[bname].keys()) == 0:
+                        to_kill.append(bname)
                         
                 processed_food = dets['food'].keys()
                 processed_virus= dets['virus'].keys()
@@ -242,4 +242,4 @@ class Gamectl:
                 cur_state['score'] = self.score
         # this \n acts like the RETURN key pressed after entering the input
         # [IMPLEMENT EXCEPTION HANDLING HERE IF THERE WAS NO '\n']
-        return dumps(cur_state)+'\n'
+        return (dumps(cur_state)+'\n', to_kill)
