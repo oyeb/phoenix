@@ -4,7 +4,7 @@ import sys
 game.send_acknowledgement()
 
 while True:
-    game_state = game('joker')
+    game_state = game('py3_bot')
 
     """
     ============================================================

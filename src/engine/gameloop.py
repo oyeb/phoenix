@@ -57,7 +57,7 @@ def check_config(bots, mapfile, arena, commit_paths, api_dir):
             raise Exception("Bad configuration, check path to %s" % commit_path)
     for bot in bots:
         if not os.path.exists(bot[1][2]):
-            raise Exception("Bad configuration, check path to source code of '%s'." % bot[0])
+            raise Exception("Bad configuration, check path to source code of '%s'\n%s." % (bot[0], bot[1][2]))
     if not os.path.exists(mapfile):
         raise Exception("Bad configuration, check path to mapfile '%s'." % mapfile)
 
@@ -97,7 +97,7 @@ def commit(bots, logfolder, filenames, commit_paths):
         os.path.join(commit_paths['replay'], filenames['replay'])
     )
 
-def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames):
+def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames, move_schema_path):
     """
     This is the game loop, it takes the moves, processes it, writes the new
     state to the medium (here pipe).
@@ -116,10 +116,9 @@ def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames):
     ) for bot in bots]
 
     try:
-        game = Gamectl()
+        game = Gamectl(move_schema_path)
         args = map(tuple, bot_args)
-        
-        game_state_log = open(os.path.join(logfolder, 'replay'), 'w')
+
         gslog = []
         
         bots = [Botctl(name, arg, logfolder) for name, arg in args]
@@ -128,7 +127,7 @@ def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames):
         map_text = open(mapfile, 'r').read().strip()
         prev_state = game.initialize_bots(map_text, [name for name, arg in args])
         
-        for i in tqdm(xrange(max_iters)):
+        for iteration in tqdm(xrange(max_iters)):
             update_and_suspend_all(bots, prev_state)
             
             moves = []
@@ -154,11 +153,16 @@ def gameloop(bots, mapfile, timeout, max_iters, arena, commit_paths, filenames):
         kill_all(bots)
         # Will merge and move all logs from the arena, basically making it free
         # again.
-        game_state_log.write("var ob = ")
-        game_state_log.write(dumps(gslog, indent=2))
-        game_state_log.write(";")
+        game_state_log = open(os.path.join(logfolder, 'replay'), 'w')
+        game_state_log.write("var ob = [")
+        game_state_log.write(',\n'.join(gslog))
+        game_state_log.write("];")
         game_state_log.close()
 
         commit(bots, logfolder, filenames, commit_paths)
-        summary = dumps(game.score, indent=2)
-        return summary
+        summary = {
+            'scores' : game.score,
+            'iters' : iteration
+        }
+        with open(os.path.join(logfolder, "summary.json"), 'w') as summary_log:
+            summary_log.write(dumps(summary))

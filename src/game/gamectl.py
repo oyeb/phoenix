@@ -6,19 +6,20 @@ from vividict import vividict
 from copy import deepcopy
 from math import sin, cos, radians
 from random import randint, sample
+import sys
 
-class Gamectl:
+class Gamectl():
+    def __init__(self, move_schema_path):
+        move_schema = open(move_schema_path, 'r').read().strip()
+        self.validator = Draft4Validator(loads(move_schema))
+
     def is_valid_move(self, prev_state, bot_move):
         """Validates the move made by a bot."""
-
-        cdir = os.path.dirname(os.path.realpath('__file__'))
-        move_schema = open(os.path.join(cdir, 'src', 'game', 'moveschema.json'), 'r').read()
-        
         try:
             move = loads(bot_move)
-            Draft4Validator(loads(move_schema)).validate(move)
+            self.validator.validate(move)
         except Exception as e:
-            print "[*] Exception: {}".format(e.message)
+            print "[*] Move Exception: {}".format(e.message)
             return False
         else:
             return True

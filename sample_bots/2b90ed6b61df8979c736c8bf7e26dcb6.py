@@ -3,7 +3,7 @@ from botapi import game
 game.send_acknowledgement()
 
 while True:
-    game_state = game('kevin')
+    game_state = game('py2_bot')
     
     """
     ============================================================
