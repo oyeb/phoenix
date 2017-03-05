@@ -10,7 +10,7 @@ from signal import SIGCONT, SIGSTOP, SIGTERM, SIGINT
 from time import sleep
 from resource import setrlimit, RLIMIT_AS
 import sys
-from syscall_filter import syscall_filter
+# from syscall_filter import syscall_filter
 from random import randint
 import fcntl
 from select import select
@@ -72,7 +72,7 @@ class Botctl:
         
         if self.bot_pid == 0:
             # seccomp filter
-            syscall_filter()
+            # syscall_filter()
 
             os.close(self.BOTIN_PARENT)
             os.close(self.BOTOUT_PARENT)

@@ -78,7 +78,6 @@ def collision_bot_static_entity(bot, entity, rad):
         (dist(end, entity) <= bot['radius'])) and bot['radius'] >= 1.8*rad:
         
         time_coll = (dist(init, d) - sqrt(bot['radius']**2 - dist(d, entity)**2))/bot['velocity']
-        print "[*] Event: bot ate a food or virus"
         return (True, time_coll)
     else:
         return (False, None)
@@ -105,7 +104,6 @@ def collision_bots_dynamic(bota, botb):
         (dist(end, bota['center']) <= bota['radius'])) and bota['radius'] >= 1.8*botb['radius']:
         
         time_coll = TimeOfClosestApproach(bota, botb)
-        print "[*] Event: bot another bot"
         return (True, time_coll)
     else:
         return (False, None)
